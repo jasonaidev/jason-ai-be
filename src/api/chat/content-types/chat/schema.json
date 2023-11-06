@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "chats",
+  "info": {
+    "singularName": "chat",
+    "pluralName": "chats",
+    "displayName": "chat",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "messages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::message.message",
+      "mappedBy": "chat"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "chat"
+    }
+  }
+}

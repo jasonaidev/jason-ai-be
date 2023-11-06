@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_assistant_message_assistant_messages",
+  "info": {
+    "displayName": "assistant_message",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "message": {
+      "type": "text"
+    }
+  }
+}

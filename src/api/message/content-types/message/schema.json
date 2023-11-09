@@ -17,12 +17,6 @@
     },
     "assistant_message": {
       "type": "text"
-    },
-    "chat": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::chat.chat",
-      "inversedBy": "messages"
     }
   }
 }

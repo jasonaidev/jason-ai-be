@@ -408,11 +408,6 @@ export interface ApiMessageMessage extends Schema.CollectionType {
   attributes: {
     user_message: Attribute.Text;
     assistant_message: Attribute.Text;
-    chat: Attribute.Relation<
-      'api::message.message',
-      'manyToOne',
-      'api::chat.chat'
-    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

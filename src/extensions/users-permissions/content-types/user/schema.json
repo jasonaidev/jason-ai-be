@@ -15,7 +15,7 @@
     "username": {
       "type": "string",
       "minLength": 3,
-      "unique": true,
+      "unique": false,
       "configurable": false,
       "required": true
     },
@@ -57,6 +57,18 @@
       "type": "boolean",
       "default": false,
       "configurable": false
+    },
+    "profile_image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "configurable": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     },
     "role": {
       "type": "relation",

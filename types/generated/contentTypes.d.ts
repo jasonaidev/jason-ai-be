@@ -704,7 +704,6 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   attributes: {
     username: Attribute.String &
       Attribute.Required &
-      Attribute.Unique &
       Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
@@ -723,6 +722,7 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
     confirmationToken: Attribute.String & Attribute.Private;
     confirmed: Attribute.Boolean & Attribute.DefaultTo<false>;
     blocked: Attribute.Boolean & Attribute.DefaultTo<false>;
+    profile_image: Attribute.Media;
     role: Attribute.Relation<
       'plugin::users-permissions.user',
       'manyToOne',

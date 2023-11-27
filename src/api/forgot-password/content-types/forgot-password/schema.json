@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forgot_passwords",
+  "info": {
+    "singularName": "forgot-password",
+    "pluralName": "forgot-passwords",
+    "displayName": "forgot-password",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "code": {
+      "type": "string"
+    },
+    "status": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

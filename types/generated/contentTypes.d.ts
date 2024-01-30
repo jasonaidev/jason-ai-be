@@ -714,6 +714,7 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
     singularName: 'document';
     pluralName: 'documents';
     displayName: 'document';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -721,8 +722,8 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
   attributes: {
     title: Attribute.String;
     type: Attribute.String;
-    description: Attribute.String;
-    content: Attribute.String;
+    description: Attribute.Text;
+    content: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

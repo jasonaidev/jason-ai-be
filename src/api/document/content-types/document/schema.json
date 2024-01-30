@@ -4,7 +4,8 @@
   "info": {
     "singularName": "document",
     "pluralName": "documents",
-    "displayName": "document"
+    "displayName": "document",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -18,10 +19,10 @@
       "type": "string"
     },
     "description": {
-      "type": "string"
+      "type": "text"
     },
     "content": {
-      "type": "string"
+      "type": "text"
     }
   }
 }

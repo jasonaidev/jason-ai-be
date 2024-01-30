@@ -362,112 +362,6 @@ export interface AdminTransferTokenPermission extends Schema.CollectionType {
   };
 }
 
-export interface ApiChatChat extends Schema.CollectionType {
-  collectionName: 'chats';
-  info: {
-    singularName: 'chat';
-    pluralName: 'chats';
-    displayName: 'chat';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    messages: Attribute.Relation<
-      'api::chat.chat',
-      'oneToMany',
-      'api::message.message'
-    >;
-    user: Attribute.Relation<
-      'api::chat.chat',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<'api::chat.chat', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<'api::chat.chat', 'oneToOne', 'admin::user'> &
-      Attribute.Private;
-  };
-}
-
-export interface ApiForgotPasswordForgotPassword extends Schema.CollectionType {
-  collectionName: 'forgot_passwords';
-  info: {
-    singularName: 'forgot-password';
-    pluralName: 'forgot-passwords';
-    displayName: 'forgot-password';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    user: Attribute.Relation<
-      'api::forgot-password.forgot-password',
-      'oneToOne',
-      'plugin::users-permissions.user'
-    >;
-    code: Attribute.String;
-    status: Attribute.Boolean & Attribute.DefaultTo<false>;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::forgot-password.forgot-password',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::forgot-password.forgot-password',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
-export interface ApiMessageMessage extends Schema.CollectionType {
-  collectionName: 'messages';
-  info: {
-    singularName: 'message';
-    pluralName: 'messages';
-    displayName: 'message';
-    description: '';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    user_message: Attribute.Text;
-    assistant_message: Attribute.Text;
-    chat: Attribute.Relation<
-      'api::message.message',
-      'manyToOne',
-      'api::chat.chat'
-    >;
-    createdAt: Attribute.DateTime;
-    updatedAt: Attribute.DateTime;
-    publishedAt: Attribute.DateTime;
-    createdBy: Attribute.Relation<
-      'api::message.message',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-    updatedBy: Attribute.Relation<
-      'api::message.message',
-      'oneToOne',
-      'admin::user'
-    > &
-      Attribute.Private;
-  };
-}
-
 export interface PluginUploadFile extends Schema.CollectionType {
   collectionName: 'files';
   info: {
@@ -782,6 +676,145 @@ export interface PluginUsersPermissionsUser extends Schema.CollectionType {
   };
 }
 
+export interface ApiChatChat extends Schema.CollectionType {
+  collectionName: 'chats';
+  info: {
+    singularName: 'chat';
+    pluralName: 'chats';
+    displayName: 'chat';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    messages: Attribute.Relation<
+      'api::chat.chat',
+      'oneToMany',
+      'api::message.message'
+    >;
+    user: Attribute.Relation<
+      'api::chat.chat',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<'api::chat.chat', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<'api::chat.chat', 'oneToOne', 'admin::user'> &
+      Attribute.Private;
+  };
+}
+
+export interface ApiDocumentDocument extends Schema.CollectionType {
+  collectionName: 'documents';
+  info: {
+    singularName: 'document';
+    pluralName: 'documents';
+    displayName: 'document';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    type: Attribute.String;
+    description: Attribute.String;
+    content: Attribute.String;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::document.document',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::document.document',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiForgotPasswordForgotPassword extends Schema.CollectionType {
+  collectionName: 'forgot_passwords';
+  info: {
+    singularName: 'forgot-password';
+    pluralName: 'forgot-passwords';
+    displayName: 'forgot-password';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    user: Attribute.Relation<
+      'api::forgot-password.forgot-password',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    code: Attribute.String;
+    status: Attribute.Boolean & Attribute.DefaultTo<false>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::forgot-password.forgot-password',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::forgot-password.forgot-password',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
+export interface ApiMessageMessage extends Schema.CollectionType {
+  collectionName: 'messages';
+  info: {
+    singularName: 'message';
+    pluralName: 'messages';
+    displayName: 'message';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    user_message: Attribute.Text;
+    assistant_message: Attribute.Text;
+    chat: Attribute.Relation<
+      'api::message.message',
+      'manyToOne',
+      'api::chat.chat'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::message.message',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::message.message',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -792,15 +825,16 @@ declare module '@strapi/types' {
       'admin::api-token-permission': AdminApiTokenPermission;
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
-      'api::chat.chat': ApiChatChat;
-      'api::forgot-password.forgot-password': ApiForgotPasswordForgotPassword;
-      'api::message.message': ApiMessageMessage;
       'plugin::upload.file': PluginUploadFile;
       'plugin::upload.folder': PluginUploadFolder;
       'plugin::i18n.locale': PluginI18NLocale;
       'plugin::users-permissions.permission': PluginUsersPermissionsPermission;
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
+      'api::chat.chat': ApiChatChat;
+      'api::document.document': ApiDocumentDocument;
+      'api::forgot-password.forgot-password': ApiForgotPasswordForgotPassword;
+      'api::message.message': ApiMessageMessage;
     }
   }
 }

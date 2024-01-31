@@ -23,6 +23,30 @@
     },
     "content": {
       "type": "text"
+    },
+    "companyName": {
+      "type": "string"
+    },
+    "field": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "file": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::document.document"
     }
   }
 }

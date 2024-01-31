@@ -731,7 +731,7 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
     user: Attribute.Relation<
       'api::document.document',
       'oneToOne',
-      'api::document.document'
+      'plugin::users-permissions.user'
     >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;

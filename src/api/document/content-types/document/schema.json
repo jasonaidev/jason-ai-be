@@ -34,19 +34,20 @@
       "type": "string"
     },
     "file": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     },
     "user": {
       "type": "relation",
       "relation": "oneToOne",
-      "target": "api::document.document"
+      "target": "plugin::users-permissions.user"
     }
   }
 }

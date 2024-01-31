@@ -724,6 +724,15 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
     type: Attribute.String;
     description: Attribute.Text;
     content: Attribute.Text;
+    companyName: Attribute.String;
+    field: Attribute.String;
+    email: Attribute.String;
+    file: Attribute.Media;
+    user: Attribute.Relation<
+      'api::document.document',
+      'oneToOne',
+      'api::document.document'
+    >;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

@@ -55,7 +55,7 @@ module.exports = {
     const isEmailSend = await strapi.plugin('email').service('email').send({
       to: email, // Replace with the user's email
       from: process.env.SMTP_USERNAME,
-      subject: 'Password Reset for Llyod',
+      subject: 'Password Reset for Jason',
       text: `Hello,
       
       You have requested to reset your password for your JASON account.

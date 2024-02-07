@@ -76,6 +76,15 @@
       "target": "plugin::users-permissions.role",
       "inversedBy": "users",
       "configurable": false
+    },
+    "roles": {
+      "type": "enumeration",
+      "enum": [
+        "Admin",
+        "User"
+      ],
+      "default": "User",
+      "required": false
     }
   }
 }

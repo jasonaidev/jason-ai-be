@@ -5,13 +5,13 @@ module.exports = {
   async chatbotResponse(ctx) {
 
     try {
-      const { chatId } = ctx.request.body;
+      const { chat } = ctx.request.body;
 
       const process = await condenseChatEngine(ctx.request.body);
 
       const newMessage = await strapi.db.query('api::message.message').create({
         data: {
-          chat: chatId,
+          chat: chat,
           publishedAt: new Date(),
           ...process,
         },

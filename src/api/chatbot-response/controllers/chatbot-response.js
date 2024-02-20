@@ -11,16 +11,12 @@ module.exports = {
 
       const newMessage = await strapi.db.query('api::message.message').create({
         data: {
-          where: { chat: chatId },
+          chat: chatId,
+          publishedAt: new Date(),
           ...process,
         },
       });
 
-      // Publish the newly created message
-      await strapi.db.query('api::message.message').update({
-        where: { id: newMessage.id },
-        data: { publishedAt: new Date() },
-      });
 
       ctx.send({ ...newMessage });
 

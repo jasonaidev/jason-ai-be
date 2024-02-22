@@ -1,11 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "documents",
+  "collectionName": "policy_templates",
   "info": {
-    "singularName": "document",
-    "pluralName": "documents",
-    "displayName": "document",
-    "description": ""
+    "singularName": "policy-template",
+    "pluralName": "policy-templates",
+    "displayName": "policy_template"
   },
   "options": {
     "draftAndPublish": true
@@ -27,22 +26,18 @@
     "companyName": {
       "type": "string"
     },
-    "field": {
-      "type": "string"
-    },
     "email": {
       "type": "string"
     },
     "file": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ]
+      ],
+      "type": "media",
+      "multiple": false
     },
     "user": {
       "type": "relation",

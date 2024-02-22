@@ -4,7 +4,7 @@ const requireESM = createRequire(require.main.filename);
 const { createChatEngine } = require("./engine/index.js");
 
 /**
- * @param {{ query: any; chat_history: any; }} req
+ * @param {{ query: string; chat_history: any[]; }} req
  */
 async function condenseChatEngine(req) {
 

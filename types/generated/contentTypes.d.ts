@@ -727,7 +727,6 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
     description: Attribute.Text;
     content: Attribute.Text;
     companyName: Attribute.String;
-    field: Attribute.String;
     email: Attribute.String;
     file: Attribute.Media;
     user: Attribute.Relation<
@@ -735,6 +734,12 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
+    template: Attribute.Relation<
+      'api::document.document',
+      'oneToOne',
+      'api::policy-template.policy-template'
+    >;
+    conversation: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -827,6 +832,50 @@ export interface ApiMessageMessage extends Schema.CollectionType {
   };
 }
 
+export interface ApiPolicyTemplatePolicyTemplate extends Schema.CollectionType {
+  collectionName: 'policy_templates';
+  info: {
+    singularName: 'policy-template';
+    pluralName: 'policy-templates';
+    displayName: 'policy_template';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    title: Attribute.String;
+    type: Attribute.String;
+    description: Attribute.Text;
+    content: Attribute.Text;
+    companyName: Attribute.String;
+    email: Attribute.String;
+    file: Attribute.Media;
+    user: Attribute.Relation<
+      'api::policy-template.policy-template',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    sections: Attribute.JSON;
+    templateConfig: Attribute.Component<'message.message', true>;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::policy-template.policy-template',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::policy-template.policy-template',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 declare module '@strapi/types' {
   export module Shared {
     export interface ContentTypes {
@@ -847,6 +896,7 @@ declare module '@strapi/types' {
       'api::document.document': ApiDocumentDocument;
       'api::forgot-password.forgot-password': ApiForgotPasswordForgotPassword;
       'api::message.message': ApiMessageMessage;
+      'api::policy-template.policy-template': ApiPolicyTemplatePolicyTemplate;
     }
   }
 }

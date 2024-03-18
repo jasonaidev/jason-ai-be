@@ -1,10 +1,10 @@
 {
   "kind": "collectionType",
-  "collectionName": "documents",
+  "collectionName": "policy_templates",
   "info": {
-    "singularName": "document",
-    "pluralName": "documents",
-    "displayName": "document",
+    "singularName": "policy-template",
+    "pluralName": "policy-templates",
+    "displayName": "policy_template",
     "description": ""
   },
   "options": {
@@ -46,13 +46,13 @@
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
     },
-    "template": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::policy-template.policy-template"
-    },
-    "conversation": {
+    "sections": {
       "type": "json"
+    },
+    "templateConfig": {
+      "type": "component",
+      "repeatable": true,
+      "component": "message.message"
     }
   }
 }

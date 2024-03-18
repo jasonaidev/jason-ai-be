@@ -10,13 +10,19 @@
     "strapi": "strapi"
   },
   "dependencies": {
+    "@langchain/openai": "^0.0.14",
     "@strapi/plugin-i18n": "4.14.4",
     "@strapi/plugin-users-permissions": "4.14.4",
     "@strapi/provider-email-nodemailer": "^4.15.4",
     "@strapi/provider-upload-cloudinary": "^4.15.4",
     "@strapi/strapi": "4.14.4",
+    "axios": "^1.6.7",
     "better-sqlite3": "8.6.0",
+    "form-data": "^4.0.0",
+    "langchain": "^0.1.21",
     "llamaindex": "^0.1.11",
+    "openai": "^4.28.4",
+    "pdf-parse": "^1.1.1",
     "pg": "^8.11.3",
     "pg-connection-string": "^2.6.2"
   },

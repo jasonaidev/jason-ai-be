@@ -1,15 +1,13 @@
 {
   "collectionName": "components_message_messages",
   "info": {
-    "displayName": "message"
+    "displayName": "message",
+    "description": ""
   },
   "options": {},
   "attributes": {
-    "user_message": {
-      "type": "text"
-    },
-    "assistant_message": {
-      "type": "text"
+    "sections": {
+      "type": "json"
     }
   }
 }

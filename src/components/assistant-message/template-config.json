@@ -1,0 +1,12 @@
+{
+  "collectionName": "components_assistant_message_template_configs",
+  "info": {
+    "displayName": "templateConfig"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    }
+  }
+}

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "policy-template",
     "pluralName": "policy-templates",
-    "displayName": "policy_template"
+    "displayName": "policy_template",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -30,14 +31,15 @@
       "type": "string"
     },
     "file": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images",
         "files",
         "videos",
         "audios"
-      ],
-      "type": "media",
-      "multiple": false
+      ]
     },
     "user": {
       "type": "relation",
@@ -46,6 +48,11 @@
     },
     "sections": {
       "type": "json"
+    },
+    "templateConfig": {
+      "type": "component",
+      "repeatable": true,
+      "component": "message.message"
     }
   }
 }

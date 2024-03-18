@@ -11,14 +11,24 @@ export interface AssistantMessageAssistantMessage extends Schema.Component {
   };
 }
 
+export interface AssistantMessageTemplateConfig extends Schema.Component {
+  collectionName: 'components_assistant_message_template_configs';
+  info: {
+    displayName: 'templateConfig';
+  };
+  attributes: {
+    title: Attribute.String;
+  };
+}
+
 export interface MessageMessage extends Schema.Component {
   collectionName: 'components_message_messages';
   info: {
     displayName: 'message';
+    description: '';
   };
   attributes: {
-    user_message: Attribute.Text;
-    assistant_message: Attribute.Text;
+    sections: Attribute.JSON;
   };
 }
 
@@ -37,6 +47,7 @@ declare module '@strapi/types' {
   export module Shared {
     export interface Components {
       'assistant-message.assistant-message': AssistantMessageAssistantMessage;
+      'assistant-message.template-config': AssistantMessageTemplateConfig;
       'message.message': MessageMessage;
       'user-message.user-message': UserMessageUserMessage;
     }

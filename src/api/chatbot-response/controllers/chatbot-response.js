@@ -1,4 +1,4 @@
-const { condenseChatEngine } = require("../../../../utils/chatResponse.js");
+const { condenseChatEngine } = require("../../../../utils/chatResponse/chatResponse");
 
 module.exports = {
 

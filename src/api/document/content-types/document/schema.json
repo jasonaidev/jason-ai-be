@@ -27,9 +27,6 @@
     "companyName": {
       "type": "string"
     },
-    "field": {
-      "type": "string"
-    },
     "email": {
       "type": "string"
     },
@@ -49,7 +46,12 @@
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
     },
-    "sections": {
+    "template": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::policy-template.policy-template"
+    },
+    "conversation": {
       "type": "json"
     }
   }

@@ -727,7 +727,6 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
     description: Attribute.Text;
     content: Attribute.Text;
     companyName: Attribute.String;
-    field: Attribute.String;
     email: Attribute.String;
     file: Attribute.Media;
     user: Attribute.Relation<
@@ -735,7 +734,12 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
       'oneToOne',
       'plugin::users-permissions.user'
     >;
-    sections: Attribute.JSON;
+    template: Attribute.Relation<
+      'api::document.document',
+      'oneToOne',
+      'api::policy-template.policy-template'
+    >;
+    conversation: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -834,6 +838,7 @@ export interface ApiPolicyTemplatePolicyTemplate extends Schema.CollectionType {
     singularName: 'policy-template';
     pluralName: 'policy-templates';
     displayName: 'policy_template';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -852,6 +857,7 @@ export interface ApiPolicyTemplatePolicyTemplate extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     sections: Attribute.JSON;
+    templateConfig: Attribute.Component<'message.message', true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

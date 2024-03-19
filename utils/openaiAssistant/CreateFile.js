@@ -13,7 +13,7 @@ async function createFile(filePath) {
 
         // Ensure the file exists before attempting to upload
         if (fs.existsSync(filePath)) {
-            console.log('The file exists.');
+            console.log('The file exists.', filePath);
         } else {
             console.log('The file does not exist.');
         }

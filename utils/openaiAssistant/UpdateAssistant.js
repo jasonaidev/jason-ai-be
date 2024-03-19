@@ -12,7 +12,7 @@ const ASSISTANT_DEFAULT_INSTRUCTIONS = `
     Your task is to analyze the provided policy sample, incorporate the user-inputted prompts, and generate a document with same formatting, design, and font. 
     You should ensure that the resulting document maintains the same design, format, and styling as the original.
     `
-const ASSISTANT_NAME = "The Document Generator Test"
+const ASSISTANT_NAME = "The Document Generator"
 const ASSISTANT_MODEL = "gpt-4-1106-preview"
 const ASSISTANT_ID = "asst_lfYyN7NN6tPMGZkHeXSlJqDh"
 // const ASSISTANT_ID = "asst_8OxHJKcwydxvGTH9Y60KhVie"

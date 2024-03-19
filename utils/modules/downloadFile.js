@@ -15,7 +15,10 @@ const downloadFile = async (url, outputPath) => {
     response.data.pipe(writer);
 
     return new Promise((resolve) => {
-      writer.on('finish', () => resolve(true)); // Resolve true on successful write finish
+      writer.on('finish', () => {
+        console.log('File has been written successfully.'); // Log on successful write finish
+        resolve(true); // Resolve true on successful write finish
+      });
       writer.on('error', () => {
         console.error('An error occurred during file writing.');
         writer.close();

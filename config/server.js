@@ -9,12 +9,12 @@ module.exports = ({ env }) => ({
   },
   admin: {
     watchIgnoreFiles: [
-        "**/files",
-        "../files",
-        "./files",
-        "*/files",
-        "/files",
-        "files",
+        "**/public",
+        "../public",
+        "./public",
+        "*/public",
+        "/public",
+        "public",
       ]
 }
 });

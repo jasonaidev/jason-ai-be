@@ -33,7 +33,7 @@ async function createFile(filePath) {
 
         // Re-throw the error if you want the caller to handle it,
         // or handle it here based on your application's needs
-        throw error;
+        throw new Error(error);
     }
 }
 

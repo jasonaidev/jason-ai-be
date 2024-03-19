@@ -9,7 +9,6 @@ const { queryToOpenAi } = require("./ai");
 const { JSONLoader } = require("langchain/document_loaders/fs/json");
 const path = require('path');
 
-
 // @ts-ignore
 async function createDocument(req) {
 
@@ -32,7 +31,7 @@ async function createDocument(req) {
         // Example usage:
         const fileUrl = selectedTemplate?.file?.url;
         const fileName = selectedTemplate?.file?.name;
-        const outputPath = path.join(__dirname, `../../files/${fileName}`);
+        const outputPath = path.join(__dirname, `../../public/files/${fileName}`);
 
 
         const fileStatus = await downloadFile(fileUrl, outputPath);
@@ -41,14 +40,6 @@ async function createDocument(req) {
         if (!fileStatus) {
             throw new Error('Failed to download file.');
         }
-
-
-        // let uploadedFileId = null;
-
-        // if (fileStatus) {
-        //     uploadedFileId = await createFile(outputPath)
-        // }
-
 
         const uploadedFileId = await createFile(outputPath);
         if (!uploadedFileId) {
@@ -124,6 +115,7 @@ async function createDocument(req) {
         
     } catch (error) {
         console.error("Error at Create Document:++ ", error);
+        throw error;
     }
 };
 

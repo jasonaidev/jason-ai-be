@@ -115,6 +115,7 @@ async function createDocument(req) {
         
     } catch (error) {
         console.error("Error at Create Document:++ ", error);
+        throw error;
     }
 };
 

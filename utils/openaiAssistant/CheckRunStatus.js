@@ -22,9 +22,7 @@ async function CheckRunStatus(params) {
         return runStatus
     } catch (error) {
         console.error('Error at Check Run Status Assistant Api:', error);
-
-        throw error;
-
+        throw new Error(error);
     }
 
 }

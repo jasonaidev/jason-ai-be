@@ -56,7 +56,7 @@ async function ListMessages(threadId) {
         return { messagesList, filenames };
     } catch (error) {
         console.error('Error at ListMessages API:', error);
-        throw error;
+        throw new Error(error);
     }
 }
 

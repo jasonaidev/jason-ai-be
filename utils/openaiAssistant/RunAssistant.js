@@ -23,7 +23,7 @@ async function RunAssistant(threadId) {
         return run.id
     } catch (error) {
         console.error('Error at RunAssistant Api:', error);
-        throw error;
+        throw new Error(error);
     }
 
 }

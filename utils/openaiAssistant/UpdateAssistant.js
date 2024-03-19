@@ -42,7 +42,7 @@ async function updateAssistant(file_id) {
         return assistant
     } catch (error) {
         console.error('Error at Update Assistant Api:', error.error);
-        throw error;
+        throw new Error(error);
     }
 
 }

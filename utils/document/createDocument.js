@@ -28,6 +28,8 @@ async function createDocument(req) {
             throw new Error('Template or file URL not found.');
         }
 
+        console.log("selectedTemplate: ", selectedTemplate);
+
         // Example usage:
         const fileUrl = selectedTemplate?.file?.url;
         const fileName = selectedTemplate?.file?.name;

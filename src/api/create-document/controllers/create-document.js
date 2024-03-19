@@ -14,7 +14,7 @@ module.exports = {
       ctx.send({...process})
 
     } catch (err) {
-      ctx.body = err;
+      ctx.throw(400, `Document creation failed: ${err.message}`); // Handle errors with specific messages
     }
 
   }

@@ -32,7 +32,7 @@ async function CreateThread(params) {
         return threadId
       } catch (error) {
         console.error('Error at CreateThread Api:', error);
-        throw error;
+        throw new Error(error);
 
       }
 

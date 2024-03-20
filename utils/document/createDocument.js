@@ -33,7 +33,7 @@ async function createDocument(req) {
         // Example usage:
         const fileUrl = selectedTemplate?.file?.url;
         const fileName = selectedTemplate?.file?.name;
-        const outputPath = path.join(__dirname, `../../public/files/${fileName}`);
+        const outputPath = path.join(__dirname, `public/files/${fileName}`);
 
 
         const fileStatus = await downloadFile(fileUrl, outputPath);

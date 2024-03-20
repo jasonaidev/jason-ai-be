@@ -3,7 +3,7 @@ const path = require('path');
 
 
 async function saveFile(dataBytes, fileName) {
-    const directoryPath = path.join(__dirname, '../../public', 'files');
+    const directoryPath = path.join(__dirname, 'public', 'files');
 
     const bufferDataBytes = await dataBytes.buffer();
 

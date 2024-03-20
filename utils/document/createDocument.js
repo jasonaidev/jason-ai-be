@@ -18,8 +18,8 @@ async function createDocument(req) {
 
 
         const selectedTemplate = await strapi.db.query('api::policy-template.policy-template').findOne({
-            data: {
-                where: { id: data.template }
+            where: {
+                id: data?.template
             },
             populate: true
         })
@@ -114,7 +114,7 @@ async function createDocument(req) {
         console.log("Entry Saved into the DB+++ ", entry);
 
         return entry
-        
+
     } catch (error) {
         console.error("Error at Create Document:++ ", error);
         throw error;

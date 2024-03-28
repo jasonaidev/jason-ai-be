@@ -4,15 +4,20 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function RunAssistant(threadId) {
+/**
+ * @param {any} threadId
+ * @param {any} instructions
+ */
+async function RunAssistant(threadId, instructions) {
 
     try {
 
-        const assistantId = "asst_lfYyN7NN6tPMGZkHeXSlJqDh"
+        const assistantId = process.env.OPENAI_ASSISTANT_ID
 
 
         const run = await openai.beta.threads.runs.create(threadId, {
             assistant_id: assistantId,
+            additional_instructions: instructions
         });
 
         // Logging the details of the created run for debugging. This includes the run ID and any other relevant information.

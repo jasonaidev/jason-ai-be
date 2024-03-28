@@ -10,7 +10,6 @@ module.exports = {
 
       const process = await createDocument(ctx.request.body);
 
-      // ctx.send({ ...newDocument });
       ctx.send({...process})
 
     } catch (err) {

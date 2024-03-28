@@ -2,8 +2,6 @@ const OpenAI = require('openai');
 // @ts-ignore
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-    organization: process.env.OPENAI_ORGANIZATION_ID,
-    // organization: 'org-kM1WMmVJildBGFO0a1hrZAPK'
 });
 
 const ASSISTANT_DEFAULT_INSTRUCTIONS = `

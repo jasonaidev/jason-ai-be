@@ -1,7 +1,15 @@
-const { createRequire } = require('module');
-const requireESM = createRequire(require.main.filename);
+// @ts-nocheck
 
-const { createChatEngine } = require("./engine/index.js");
+const {
+  OpenAIAgent,
+  VectorStoreIndex,
+  QueryEngineTool,
+  PineconeVectorStore,
+  serviceContextFromDefaults,
+} = require("llamaindex");
+
+const { Pinecone } = require("@pinecone-database/pinecone");
+
 
 /**
  * @param {{ query: string; chat_history: any[]; }} req
@@ -9,17 +17,6 @@ const { createChatEngine } = require("./engine/index.js");
 async function condenseChatEngine(req) {
 
   try {
-
-    let OpenAI;
-
-    try {
-      const llamaindexModule = requireESM("llamaindex");
-      OpenAI = llamaindexModule.OpenAI;
-    } catch (error) {
-      console.error("Error loading llamaindex:", error);
-      // Handle the error or return a default value
-    }
-
 
     const { query, chat_history } = req;
     console.log("Receive Query at ChatController file: ", query);
@@ -46,24 +43,46 @@ async function condenseChatEngine(req) {
     });
 
 
-
-
-    const llm = new OpenAI({
-      model: process.env.MODEL || "gpt-3.5-turbo",
+    const pinecone = new Pinecone({
+      apiKey: process.env.PINECONE_API_KEY || "",
     });
 
-    const chatEngine = await createChatEngine(llm);
+    const pcvs = new PineconeVectorStore();
 
-    // Calling LlamaIndex's ChatEngine to get a response
-    const response = await chatEngine.chat({
+    const ctx = serviceContextFromDefaults();
+
+    const index = await VectorStoreIndex.fromVectorStore(pcvs, ctx);
+
+    const queryEngine = await index.asQueryEngine();
+
+
+    // Create a QueryEngineTool with the query engine
+    const queryEngineTool = new QueryEngineTool({
+      queryEngine: queryEngine,
+      metadata: {
+        name: "policy_query_engine",
+        description: "A query engine for Policy documents",
+      },
+    });
+
+    // Create an OpenAIAgent with the function tools
+    const agent = new OpenAIAgent({
+      tools: [queryEngineTool],
+      verbose: true,
+    });
+
+    // Chat with the agent
+    const response = await agent.chat({
       message: query,
       chatHistory: messages
     });
 
+    // Print the response
+    console.log("Response of the BOT+++++: ", String(response));
 
     const result = {
       user_message: query,
-      assistant_message: response.response,
+      assistant_message: String(response),
     }
 
     return result;

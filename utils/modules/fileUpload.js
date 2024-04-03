@@ -1,19 +1,34 @@
 const fs = require('fs');
 const path = require('path');
 const mime = require('mime-types'); // Used to detect the file's mime type
+const { docxToPdf } = require('./docxToPdf');
+const { waitForFile } = require('../services/waitForFile');
 
-async function fileUpload(fileNames) {
+/**
+ * @param {any[]} fileNames
+ * @param {string | string[]} fileExt
+ */
+async function fileUpload(fileNames, fileExt) {
 
-    const fileName = fileNames[0]
+    let fileName = fileNames[0]
     // const fileName = fileNames
     // The path to the file you want to upload
-    const filePath = path.join(__dirname, `../../public/files/${fileName}`);
+    let filePath = path.join(__dirname, `../../public/files/outputs/${fileName}`);
 
     try {
         // Ensure the file exists
         if (!fs.existsSync(filePath)) {
             throw new Error('File does not exist');
         }
+
+        // If the file needs to be converted, convert it
+        if (fileExt?.includes('.pdf')) {
+            const absolutePath = await docxToPdf(filePath, fileName);
+            filePath = absolutePath.path
+            fileName = absolutePath.updatedFileName
+        }
+
+        await waitForFile(filePath)
 
         const stats = fs.statSync(filePath);
         console.log("File Path:---- ", filePath, "++++Size:++++ ", stats);

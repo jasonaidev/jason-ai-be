@@ -61,7 +61,7 @@ async function docxToPdf(outputPath, fileName) {
             // return ("public/files/CreatePDFFromDOCX/create" + dateString + ".pdf");
             fileNameWithoutExtension = removeFileExtension(fileName);
 
-            return (`public/files/results/${fileNameWithoutExtension}.pdf`);
+            return (`public/files/outputs/${fileNameWithoutExtension}.pdf`);
 
         }
 

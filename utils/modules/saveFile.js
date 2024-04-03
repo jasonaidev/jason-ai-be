@@ -7,7 +7,7 @@ const path = require('path');
  * @param {string} fileName
  */
 async function saveFile(dataBytes, fileName) {
-    const directoryPath = path.join(__dirname, '../../public/files', 'results');
+    const directoryPath = path.join(__dirname, '../../public/files', 'outputs');
 
     const bufferDataBytes = await dataBytes.buffer();
 

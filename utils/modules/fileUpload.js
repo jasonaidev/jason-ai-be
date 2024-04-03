@@ -13,7 +13,7 @@ async function fileUpload(fileNames, fileExt) {
     let fileName = fileNames[0]
     // const fileName = fileNames
     // The path to the file you want to upload
-    let filePath = path.join(__dirname, `../../public/files/results/${fileName}`);
+    let filePath = path.join(__dirname, `../../public/files/outputs/${fileName}`);
 
     try {
         // Ensure the file exists

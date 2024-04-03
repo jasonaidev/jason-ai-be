@@ -2,8 +2,12 @@ const fs = require('fs').promises; // Correctly importing the promise-based API
 const path = require('path');
 
 
+/**
+ * @param {{ buffer: () => any; }} dataBytes
+ * @param {string} fileName
+ */
 async function saveFile(dataBytes, fileName) {
-    const directoryPath = path.join(__dirname, '../../public', 'files');
+    const directoryPath = path.join(__dirname, '../../public/files', 'outputs');
 
     const bufferDataBytes = await dataBytes.buffer();
 

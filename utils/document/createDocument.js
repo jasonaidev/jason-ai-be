@@ -2,7 +2,8 @@ const { fetchAssistantResponse } = require("../modules/chatModules");
 const { downloadFile } = require("../modules/downloadFile");
 const { fileUpload } = require("../modules/fileUpload");
 const { pdfToDoc } = require("../modules/pdfToDoc");
-const { createFile } = require("../openaiAssistant/CreateFile");
+const { pdfToDocx } = require("../modules/pdfToDocx");
+const { uploadFileToAssistant } = require("../openaiAssistant/CreateFile");
 const { CreateThread } = require("../openaiAssistant/CreateThread");
 const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
@@ -11,15 +12,12 @@ const { JSONLoader } = require("langchain/document_loaders/fs/json");
 const path = require('path');
 
 // @ts-ignore
+/**
+ * @param {{ data: any; }} req
+ */
 async function createDocument(req) {
 
     try {
-
-        // const res = await pdfToDoc('m.pdf')
-
-        // console.log("RES: ", res);
-
-        // return 'abc'
 
         const { data } = req;
         console.log("Receive Query Params: ", data);
@@ -41,9 +39,12 @@ async function createDocument(req) {
         // Example usage:
         const fileUrl = selectedTemplate?.file?.url;
         const fileName = selectedTemplate?.file?.name;
-        const outputPath = path.join(__dirname, `../../public/files/${fileName}`);
+        const fileExt = selectedTemplate?.file?.ext
 
-        // const outputPath = path.join(__dirname, `../../public/files/Deceased Notification Policy.pdf`);
+        // Fetch template details
+        // const { file: { url, name, ext } } = selectedTemplate;
+
+        const outputPath = path.join(__dirname, `../../public/files/templates/${fileName}`);
 
 
         const fileStatus = await downloadFile(fileUrl, outputPath);
@@ -52,7 +53,13 @@ async function createDocument(req) {
             throw new Error('Failed to download file.');
         }
 
-        const uploadedFileId = await createFile(outputPath);
+        
+        let filePath = fileExt?.includes('.pdf') ? await pdfToDocx(outputPath, fileName) : outputPath;
+        
+        console.log("FILE EXT: ", fileExt, fileExt?.includes('.pdf'),  filePath);
+        
+        // const uploadedFileId = await uploadFileToAssistant(outputPath);
+        const uploadedFileId = await uploadFileToAssistant(filePath);
         if (!uploadedFileId) {
             throw new Error('Failed to upload file to OpenAI.');
         }
@@ -81,14 +88,8 @@ async function createDocument(req) {
 
             It is essential to retain the original design, style, font, and format of the document.
 
-            Note: The document is provided in the ${selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained.
+            Note: The document is provided in the ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${fileExt?.includes('.pdf') ? 'docx'  :selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained and newly file named should be as ${removeFileExtension(fileName) + '_user_' + data?.user}
             `,
-
-            // inputmessage: `
-            // This document is in pdf, you should convert it into docx and then made some changes to company name as 2029 W Policy Company.
-            // Then you should convert that document to pdf again with same design and format as it is original.
-            // Please make that design and format should not disturb.
-            // `,
 
             fileId: uploadedFileId,
         };
@@ -115,7 +116,7 @@ async function createDocument(req) {
 
         let fileResponse;
         if (assistantResponse?.filenames?.length > 0) {
-            fileResponse = await fileUpload(assistantResponse?.filenames)
+            fileResponse = await fileUpload(assistantResponse?.filenames, fileExt)
         }
 
         console.log("Res of Upload: ", fileResponse);
@@ -139,12 +140,22 @@ async function createDocument(req) {
 
     } catch (error) {
         console.error("Error at Create Document:++ ", error);
-        const { data } = req;
-        await strapi.entityService.delete('api::document.document', data.id)
+        // const { data } = req;
+        // await strapi.entityService.delete('api::document.document', data.id)
 
         throw error;
     }
 };
+
+
+/**
+ * @param {string} fileName
+ */
+function removeFileExtension(fileName) {
+    const lastDotIndex = fileName.lastIndexOf('.');
+    if (lastDotIndex === -1) return fileName; // No dot found, or it's at the start, return as is
+    return fileName.substring(0, lastDotIndex);
+}
 
 
 module.exports = { createDocument };

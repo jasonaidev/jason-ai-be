@@ -1,23 +1,22 @@
 const fs = require('fs');
 const OpenAI = require('openai');
 const path = require('path');
+const { waitForFile } = require('../services/waitForFile');
 
 // @ts-ignore
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function createFile(filePath) {
+
+async function uploadFileToAssistant(filePath) {
     try {
-        // const filePath = path.join(__dirname, '../../files/AnnualReviewTemplate.docx');
+        console.log("Checking file path: ", filePath);
 
-        // Ensure the file exists before attempting to upload
-        if (fs.existsSync(filePath)) {
-            console.log('The file exists.', filePath);
-        } else {
-            console.log('The file does not exist.');
-        }
+        // Wait for the file to exist
+        await waitForFile(filePath);
 
+        // Proceed with file upload since the file now exists
         const file = await openai.files.create({
             file: fs.createReadStream(filePath),
             purpose: "assistants",
@@ -29,12 +28,11 @@ async function createFile(filePath) {
         return file.id;
     } catch (error) {
         // Log the error for debugging purposes
-        console.error("Failed to create file:", error.message);
-
+        console.error("Failed to upload file:", error.message);
         // Re-throw the error if you want the caller to handle it,
         // or handle it here based on your application's needs
         throw new Error(error);
     }
 }
 
-module.exports = { createFile };
+module.exports = { uploadFileToAssistant };

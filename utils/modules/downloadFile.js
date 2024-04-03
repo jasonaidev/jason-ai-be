@@ -2,7 +2,7 @@ const fs = require('fs');
 const axios = require('axios');
 
 // Function to download and save the file
-const downloadFile = async (url, outputPath) => {
+const downloadFile = async (/** @type {any} */ url, /** @type {fs.PathLike} */ outputPath) => {
   try {
     const response = await axios({
       method: 'GET',

@@ -1,5 +1,6 @@
 const { fetchAssistantResponse } = require("../modules/chatModules");
 const { downloadFile } = require("../modules/downloadFile");
+const { fileParser } = require("../modules/fileParser");
 const { fileUpload } = require("../modules/fileUpload");
 const { pdfToDoc } = require("../modules/pdfToDoc");
 const { pdfToDocx } = require("../modules/pdfToDocx");
@@ -71,6 +72,20 @@ async function createDocument(req) {
             throw new Error('Failed to update assistant with new file.');
         }
 
+        let user_inputs;
+        if(data?.file){
+
+            const currentDocumentFile = await strapi.db.query('plugin::upload.file').findOne({
+                where: {
+                    id: data?.file
+                },
+            })
+
+            user_inputs = await fileParser(currentDocumentFile?.url)
+
+            console.log("user_inputs Text: ", user_inputs.slice(0, 50));
+        }
+
 
         const params = {
             inputmessage: `
@@ -84,6 +99,7 @@ async function createDocument(req) {
             - Company Name: ${data?.companyName}
             - Email: ${data?.email}
 
+            ${data?.file && user_inputs ? `-${user_inputs}` : ''}
             Wherever it seems appropriate within the document, these user instructions should be incorporated or used to replace existing information.
 
             It is essential to retain the original design, style, font, and format of the document.

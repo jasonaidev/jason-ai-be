@@ -2,7 +2,6 @@ const { fetchAssistantResponse } = require("../modules/chatModules");
 const { downloadFile } = require("../modules/downloadFile");
 const { fileParser } = require("../modules/fileParser");
 const { fileUpload } = require("../modules/fileUpload");
-const { pdfToDoc } = require("../modules/pdfToDoc");
 const { pdfToDocx } = require("../modules/pdfToDocx");
 const { uploadFileToAssistant } = require("../openaiAssistant/CreateFile");
 const { CreateThread } = require("../openaiAssistant/CreateThread");

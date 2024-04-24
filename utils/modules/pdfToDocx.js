@@ -49,8 +49,10 @@ async function pdfToDocx(outputPath, fileName) {
                 if (err instanceof PDFServicesSdk.Error.ServiceApiError
                     || err instanceof PDFServicesSdk.Error.ServiceUsageError) {
                     console.log('Exception encountered while executing operation', err);
+                    throw err
                 } else {
                     console.log('Exception encountered while executing operation', err);
+                    throw err
                 }
             });
 

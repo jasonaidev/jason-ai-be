@@ -3,25 +3,20 @@ const { downloadFile } = require("../modules/downloadFile");
 const { fileParser } = require("../modules/fileParser");
 const { fileUpload, deleteFile } = require("../modules/fileUpload");
 const { pdfToDocx } = require("../modules/pdfToDocx");
-const { uploadFileToAssistant } = require("../openaiAssistant/CreateFile");
+const { uploadFileToAssistant, deleteFileFromAssistant } = require("../openaiAssistant/CreateFile");
 const { CreateThread } = require("../openaiAssistant/CreateThread");
 const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
-const { queryToOpenAi } = require("./ai");
-const { JSONLoader } = require("langchain/document_loaders/fs/json");
 const path = require('path');
 
 // @ts-ignore
 /**
  * @param {{ data: any; }} req
  */
-async function createDocument(req) {
-
+async function updateDocument(req) {
     try {
-
         const { data } = req;
-        console.log("Receive Query Params: ", data);
-
+        console.log("Receive Query Params for Update+++: ", data);
 
         const selectedTemplate = await strapi.db.query('api::policy-template.policy-template').findOne({
             where: {
@@ -41,11 +36,7 @@ async function createDocument(req) {
         const fileName = selectedTemplate?.file?.name;
         const fileExt = selectedTemplate?.file?.ext
 
-        // Fetch template details
-        // const { file: { url, name, ext } } = selectedTemplate;
-
         const outputPath = path.join(__dirname, `../../public/files/templates/${fileName}`);
-
 
         const fileStatus = await downloadFile(fileUrl, outputPath);
 
@@ -53,11 +44,11 @@ async function createDocument(req) {
             throw new Error('Failed to download file.');
         }
 
-
+        
         let filePath = fileExt?.includes('.pdf') ? await pdfToDocx(outputPath, fileName) : outputPath;
-
-        console.log("FILE EXT: ", fileExt, fileExt?.includes('.pdf'), filePath);
-
+        
+        console.log("FILE EXT: ", fileExt, fileExt?.includes('.pdf'),  filePath);
+        
         // const uploadedFileId = await uploadFileToAssistant(outputPath);
         const uploadedFileId = await uploadFileToAssistant(filePath);
         if (!uploadedFileId) {
@@ -72,7 +63,7 @@ async function createDocument(req) {
         }
 
         let user_inputs;
-        if (data?.file) {
+        if(data?.file){
 
             const currentDocumentFile = await strapi.db.query('plugin::upload.file').findOne({
                 where: {
@@ -103,7 +94,7 @@ async function createDocument(req) {
 
             It is essential to retain the original design, style, font, and format of the document.
 
-            Note: The document is provided in the ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained and newly file named should be as ${removeFileExtension(fileName) + '_user_' + data?.user}
+            Note: The document is provided in the ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${fileExt?.includes('.pdf') ? 'docx'  :selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained and newly file named should be as ${removeFileExtension(fileName) + '_user_' + data?.user}
             `,
 
             fileId: uploadedFileId,
@@ -153,8 +144,9 @@ async function createDocument(req) {
 
 
         // Delete Files
-        await deleteFile(assistantResponse?.filenames)
+        await deleteFileFromAssistant(data?.openAiFileId)
 
+        await deleteFile(assistantResponse?.filenames)
 
         return entry
 
@@ -178,4 +170,4 @@ function removeFileExtension(fileName) {
 }
 
 
-module.exports = { createDocument };
+module.exports = { updateDocument };

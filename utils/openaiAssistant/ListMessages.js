@@ -8,11 +8,12 @@ const openai = new OpenAI({
 
 async function ListMessages(threadId) {
     try {
-        console.log("Receive Thread: ", threadId);
+        console.log("Received Thread ID: ", threadId);
         const messages = await openai.beta.threads.messages.list(threadId);
 
         let filenames = []; // To store filenames of saved files
-        let messagesList = [];
+        let conversations = [];
+        let threadAnnotationFileId = null;
 
         for (const message of messages.data) {
             console.log('-'.repeat(50));
@@ -21,37 +22,42 @@ async function ListMessages(threadId) {
             for (let content of message.content) {
                 console.log(content.text.value);
                 if (content.type === 'text') {
-                    if (content.text.annotations) {
-                        for (let annotation of content.text.annotations) {
-                            console.log(`Annotation Text: ${annotation.text}`);
-                            console.log(`File_Id: ${annotation.file_path.file_id}`);
+                    if (content.text.annotations && content.text.annotations.length > 0) {
+                        const annotation = content.text.annotations[0];
+                        console.log(`Annotation Text: ${annotation.text}`);
+                        console.log(`File ID: ${annotation.file_path.file_id}`);
 
-                            try {
-                                const annotationDataBytes = await openai.files.content(annotation.file_path.file_id);
-                                const filename = annotation.text.split('/').pop();
+                        try {
+                            const annotationDataBytes = await openai.files.content(annotation.file_path.file_id);
+                            const filename = annotation.text.split('/').pop();
+                            const isFileSaved = await saveFile(annotationDataBytes, filename);
+                            console.log("Filename: ", filename, "Saved: ", isFileSaved);
 
-                                const isFileSaved = await saveFile(annotationDataBytes, filename);
-                                console.log("filename: ", filename, isFileSaved);
-
-                                if (isFileSaved) {
-                                    filenames.push(filename);
-                                }
-                                // Moved adding to messagesList outside if-else since it's done in both cases
-                                messagesList.push({
-                                    threadId: message.thread_id,
-                                    role: message.role,
-                                    content: content.text.value,
-                                    annotationFileId: annotation.file_path.file_id
-                                });
-                            } catch (error) {
-                                console.error("Error before calling saveFile", error);
-                                // Consider how you want to handle this error. Continue, break, return?
+                            if (isFileSaved) {
+                                filenames.push(filename);
                             }
+                            if (!threadAnnotationFileId) {
+                                threadAnnotationFileId = annotation.file_path.file_id; // Set top-level annotationFileId if not already set
+                            }
+                        } catch (error) {
+                            console.error("Error while handling file:", error);
                         }
                     }
+
+                    conversations.push({
+                        role: message.role,
+                        content: content.text.value
+                    });
                 }
             }
         }
+
+        // Structure the final output
+        const messagesList = {
+            threadId: threadId,
+            conversation: conversations,
+            annotationFileId: threadAnnotationFileId
+        };
         // Return after all processing is done
         return { messagesList, filenames };
     } catch (error) {

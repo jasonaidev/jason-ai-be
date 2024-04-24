@@ -53,4 +53,34 @@ async function fileUpload(fileNames, fileExt) {
     }
 }
 
-module.exports = { fileUpload };
+
+/**
+ * @param {any} fileNames
+ */
+async function deleteFile(fileNames) {
+    if (!fileNames || fileNames.length === 0) {
+        throw new Error("No file names provided.");
+    }
+
+    let fileName = fileNames[0];  // Assuming the intent is to always handle the first file
+    let filePath = path.join(__dirname, `../../public/files/outputs/${fileName}`);
+
+    try {
+
+        // Ensure the file exists
+        if (!fs.existsSync(filePath)) {
+            throw new Error('File does not exist');
+        }
+
+        fs.unlink(filePath, (err) => {
+            if (err) console.error('Error deleting the partial file:', err);
+        });
+
+        console.log('File deleted successfully');
+    } catch (error) {
+        console.error("Delete file failed:", error.message);
+        throw error;  // Re-throw the error to be handled by the caller
+    }
+}
+
+module.exports = { fileUpload, deleteFile };

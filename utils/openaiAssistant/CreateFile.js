@@ -63,7 +63,7 @@ async function deleteFileFromAssistant(fileId) {
         console.error("Failed to delete file from OpenAi Storage:", error.message);
         // Re-throw the error if you want the caller to handle it,
         // or handle it here based on your application's needs
-        throw new Error(error);
+        // throw new Error(error);
     }
 }
 

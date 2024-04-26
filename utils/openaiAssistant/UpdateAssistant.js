@@ -26,11 +26,11 @@ async function updateAssistant(file_id) {
 
         const assistantDetail = await openai.beta.assistants.retrieve(ASSISTANT_ID)
 
-        let files = assistantDetail.file_ids;
+        let files = assistantDetail?.file_ids;
 
-        if (files.length > 18) {
+        if (files?.length > 18) {
             // If there are more than 20 files, calculate how many excess files there are
-            const excessFilesCount = files.length - 18;
+            const excessFilesCount = files?.length - 18;
 
             // Remove excess files from the end of the array
             for (let i = 0; i < excessFilesCount; i++) {

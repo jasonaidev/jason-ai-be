@@ -30,7 +30,7 @@ async function updateAssistant(file_id) {
         const assistantDetail = await openai.beta.assistants.retrieve(ASSISTANT_ID)
 
         let files = assistantDetail?.file_ids || [];
-        console.log("Purpose Assistant Files: ", files);
+        console.log("Purpose Assistant Files assistantDetail: ", assistantDetail);
 
         if (files?.length > 18) {
             // If there are more than 20 files, calculate how many excess files there are

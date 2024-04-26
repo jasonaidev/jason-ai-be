@@ -4,12 +4,15 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
+/**
+ * @param {any} params
+ */
 async function CreateThread(params) {
 
     try {
         const data = params;
-        const inputMessage = data.inputmessage;
-        const file_id = data.fileId
+        const inputMessage = data?.inputmessage;
+        const file_id = data?.fileId
   
         // Überprüfen, ob die Eingabemessage vorhanden und ein String ist
         if (!inputMessage || typeof inputMessage !== 'string') {

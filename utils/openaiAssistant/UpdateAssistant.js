@@ -27,6 +27,7 @@ async function updateAssistant(file_id) {
         const assistantDetail = await openai.beta.assistants.retrieve(ASSISTANT_ID)
 
         let files = assistantDetail?.file_ids || [];
+        console.log("Purpose Assistant Files: ", files);
 
         if (files?.length > 18) {
             // If there are more than 20 files, calculate how many excess files there are
@@ -51,7 +52,7 @@ async function updateAssistant(file_id) {
         });
 
         // Logging the details of the created run for debugging. This includes the run ID and any other relevant information.
-        console.log(`Assistant: ${JSON.stringify(assistant)}`);
+        console.log(`Updated Assistant: ${JSON.stringify(assistant)}`);
 
         // Responding with the run ID in JSON format. This ID can be used for further operations
         // such as retrieving the run's output or continuing the conversation.

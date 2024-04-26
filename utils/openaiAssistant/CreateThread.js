@@ -25,7 +25,7 @@ async function CreateThread(params) {
             {
               role: "user",
               content: inputMessage,
-              file_id:[file_id]
+              file_ids:[file_id]
             },
           ],
         });

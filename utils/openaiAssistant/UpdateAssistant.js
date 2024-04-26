@@ -14,6 +14,9 @@ const ASSISTANT_DEFAULT_INSTRUCTIONS = `
 const ASSISTANT_NAME = "The Document Generator"
 const ASSISTANT_MODEL = "gpt-4-1106-preview"
 const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID
+
+console.log("ASSISTANT_ID++++ AT UPDATE ASSISTANT FILE: ", ASSISTANT_ID);
+console.log("OPENAI_API_KEY++++ AT UPDATE ASSISTANT FILE: ", process.env.OPENAI_API_KEY);
 // const ASSISTANT_ID = "asst_8OxHJKcwydxvGTH9Y60KhVie"
 
 

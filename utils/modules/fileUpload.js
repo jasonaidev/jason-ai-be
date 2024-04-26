@@ -79,7 +79,7 @@ async function deleteFile(fileNames) {
         console.log('File deleted successfully');
     } catch (error) {
         console.error("Delete file failed:", error.message);
-        throw error;  // Re-throw the error to be handled by the caller
+        // throw error;  // Re-throw the error to be handled by the caller
     }
 }
 

@@ -14,6 +14,9 @@ const ASSISTANT_DEFAULT_INSTRUCTIONS = `
 const ASSISTANT_NAME = "The Document Generator"
 const ASSISTANT_MODEL = "gpt-4-1106-preview"
 const ASSISTANT_ID = process.env.OPENAI_ASSISTANT_ID
+
+console.log("ASSISTANT_ID++++ AT UPDATE ASSISTANT FILE: ", ASSISTANT_ID);
+console.log("OPENAI_API_KEY++++ AT UPDATE ASSISTANT FILE: ", process.env.OPENAI_API_KEY);
 // const ASSISTANT_ID = "asst_8OxHJKcwydxvGTH9Y60KhVie"
 
 
@@ -27,7 +30,7 @@ async function updateAssistant(file_id) {
         const assistantDetail = await openai.beta.assistants.retrieve(ASSISTANT_ID)
 
         let files = assistantDetail?.file_ids || [];
-        console.log("Purpose Assistant Files: ", files);
+        console.log("Purpose Assistant Files assistantDetail: ", assistantDetail);
 
         if (files?.length > 18) {
             // If there are more than 20 files, calculate how many excess files there are

@@ -857,7 +857,6 @@ export interface ApiPolicyTemplatePolicyTemplate extends Schema.CollectionType {
       'plugin::users-permissions.user'
     >;
     sections: Attribute.JSON;
-    templateConfig: Attribute.Component<'message.message', true>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

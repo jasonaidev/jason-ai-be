@@ -847,16 +847,12 @@ export interface ApiPolicyTemplatePolicyTemplate extends Schema.CollectionType {
     title: Attribute.String;
     type: Attribute.String;
     description: Attribute.Text;
-    content: Attribute.Text;
-    companyName: Attribute.String;
-    email: Attribute.String;
     file: Attribute.Media;
     user: Attribute.Relation<
       'api::policy-template.policy-template',
       'oneToOne',
       'plugin::users-permissions.user'
     >;
-    sections: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

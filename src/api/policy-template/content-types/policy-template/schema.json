@@ -21,15 +21,6 @@
     "description": {
       "type": "text"
     },
-    "content": {
-      "type": "text"
-    },
-    "companyName": {
-      "type": "string"
-    },
-    "email": {
-      "type": "string"
-    },
     "file": {
       "type": "media",
       "multiple": false,
@@ -45,9 +36,6 @@
       "type": "relation",
       "relation": "oneToOne",
       "target": "plugin::users-permissions.user"
-    },
-    "sections": {
-      "type": "json"
     }
   }
 }

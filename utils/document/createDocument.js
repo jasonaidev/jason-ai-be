@@ -105,7 +105,7 @@ async function createDocument(req) {
 
             Note: The document is provided in the ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained and newly file named should be as ${removeFileExtension(fileName) + '_user_' + data?.user}
             
-            Additionally, generate a 50 to 100-word description of the newly generated document in a separate message as follows:
+            Additionally, generate a 50 word description of the newly generated document in a separate message as follows:
             Description: "start description here". Just write the description based on the information found within the document only. Please don't mention information about the title, filename and company of the document.
             `,
 

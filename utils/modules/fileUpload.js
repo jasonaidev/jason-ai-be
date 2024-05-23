@@ -31,7 +31,6 @@ async function fileUpload(fileNames, fileExt) {
         await waitForFile(filePath)
 
         const stats = fs.statSync(filePath);
-        console.log("File Path:---- ", filePath, "++++Size:++++ ", stats);
 
         const uploadedFile = await strapi.plugins.upload.services.upload.upload({
             data: {}, // Mandatory declaration (can be empty)

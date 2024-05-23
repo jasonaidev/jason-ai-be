@@ -14,6 +14,7 @@ async function ListMessages(threadId) {
         let filenames = []; // To store filenames of saved files
         let conversations = [];
         let threadAnnotationFileId = null;
+        let description = ''
 
         for (const message of messages.data) {
             console.log('-'.repeat(50));
@@ -48,6 +49,10 @@ async function ListMessages(threadId) {
                         role: message.role,
                         content: content.text.value
                     });
+
+                    if (message.role === 'assistant' && content.text.value.startsWith('Description:')) {
+                        description = content.text.value.substring(12).trim();
+                    }
                 }
             }
         }
@@ -59,7 +64,7 @@ async function ListMessages(threadId) {
             annotationFileId: threadAnnotationFileId
         };
         // Return after all processing is done
-        return { messagesList, filenames };
+        return { messagesList, filenames, description };
     } catch (error) {
         console.error('Error at ListMessages API:', error);
         throw new Error(error);

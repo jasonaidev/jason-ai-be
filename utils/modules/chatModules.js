@@ -3,6 +3,10 @@
  const { ListMessages } = require("../openaiAssistant/ListMessages")
 
 
+/**
+ * @param {any} runId
+ * @param {any} threadId
+ */
 async function fetchAssistantResponse(runId, threadId) {
   try {
     if (runId) {

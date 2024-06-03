@@ -79,22 +79,29 @@ async function updateDocument(req) {
 
         const params = {
             inputmessage: `
-            Please utilize the document identified by ID: *${uploadedFileId}*, applying it as a template of the type ${selectedTemplate?.type || "Annual Review Template"}. Your tasks are outlined as follows:
+            Effectuate the following:
 
-            1. Conduct a thorough, word-by-word analysis to fully grasp the document's content.
-            2. Upon achieving a comprehensive understanding, you are to update the document in accordance with the given user prompts.
+                1. Conduct a thorough, word-by-word analysis of the document identified by ID: *${uploadedFileId}* to fully grasp its content.
+                
+                2. Update the document based on the given user inputs while retaining the original design, style, font, and format.
 
-            User Instructions for Updates:
-            - Title: ${data?.title}
-            - Company Name: ${data?.companyName}
-            - Email: ${data?.email}
+                **User Instructions for Updates:**
+                - **Title:** ${data?.title} (Maintain same font size and style)
+                - **Company Name:** ${data?.companyName} (Replace wherever found in the document)
+                - **Email:** ${data?.email} (Replace wherever found in the document)
+                - **Additional User Inputs:** ${data?.file ? user_inputs : ''}
 
-            ${data?.file && user_inputs ? `-${user_inputs}` : ''}
-            Wherever it seems appropriate within the document, these user instructions should be incorporated or used to replace existing information.
+                3. Ensure that the format, design, style, and font are consistently maintained. Produce the updated document in the same ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. The new file name should be: ${removeFileExtension(fileName) + '_user_' + data?.user}.
 
-            It is essential to retain the original design, style, font, and format of the document.
+                4.Generate a 50-word description of the newly updated document in a separate message based solely on the content within the document. Do not mention the title, filename, or company name. 
+                    Message format as follows:
+                    Description: "start description here".
 
-            Note: The document is provided in the ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${fileExt?.includes('.pdf') ? 'docx'  :selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained and newly file named should be as ${removeFileExtension(fileName) + '_user_' + data?.user}
+                **Clarifying Notes:**
+                - Follow the exact update instructions provided by the user.
+                - Ensure every modification adheres strictly to the original format specifics.
+
+                If any step or instruction needs further detail or there are uncertainties, refer back for clarification.
             `,
 
             fileId: uploadedFileId,

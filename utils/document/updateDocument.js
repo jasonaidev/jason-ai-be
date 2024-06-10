@@ -95,7 +95,7 @@ async function updateDocument(req) {
 
                 4.Generate a 50-word description of the newly updated document in a separate message based solely on the content within the document. Do not mention the title, filename, or company name. 
                     Message format as follows:
-                    Description: "start description here".
+                    "Description": "start description here".
 
                 **Clarifying Notes:**
                 - Follow the exact update instructions provided by the user.

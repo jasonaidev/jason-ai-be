@@ -6,8 +6,9 @@
 /**
  * @param {any} runId
  * @param {any} threadId
+ * @param {any} fileSearch
  */
-async function fetchAssistantResponse(runId, threadId) {
+async function fetchAssistantResponse(runId, threadId, fileSearch) {
   try {
     if (runId) {
 
@@ -34,7 +35,7 @@ async function fetchAssistantResponse(runId, threadId) {
     }
 
 
-    const response = await ListMessages(threadId);
+    const response = await ListMessages(threadId, fileSearch);
     return response;
     
   } catch (error) {

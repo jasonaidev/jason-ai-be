@@ -7,17 +7,19 @@ const openai = new OpenAI({
 /**
  * @param {any} threadId
  * @param {any} instructions
+ * @param {any} file_search
  */
-async function RunAssistant(threadId, instructions) {
+async function RunAssistant(threadId, instructions, file_search) {
 
     try {
 
-        const assistantId = process.env.OPENAI_ASSISTANT_ID
+        const assistantId = process.env.DOCUMENT_GENERATOR_OPENAI_ASSISTANT_ID
+        const dataExtractionAssistantId = process.env.Document_Information_Extraction_OPENAI_ASSISTANT_ID
 
 
         const run = await openai.beta.threads.runs.create(threadId, {
-            assistant_id: assistantId,
-            additional_instructions: instructions
+            assistant_id: file_search ? dataExtractionAssistantId : assistantId,
+            // additional_instructions: instructions
         });
 
         // Logging the details of the created run for debugging. This includes the run ID and any other relevant information.

@@ -13,6 +13,7 @@ async function CreateThread(params) {
         const data = params;
         const inputMessage = data?.inputmessage;
         const file_id = data?.fileId
+        const file_search = data?.file_search
   
         // Überprüfen, ob die Eingabemessage vorhanden und ein String ist
         if (!inputMessage || typeof inputMessage !== 'string') {
@@ -25,7 +26,7 @@ async function CreateThread(params) {
             {
               role: "user",
               content: inputMessage,
-              file_ids:[file_id]
+              attachments: [{ file_id: file_id, tools: [{ type: file_search ? "file_search" : "code_interpreter" }] }],
             },
           ],
         });

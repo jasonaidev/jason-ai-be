@@ -1,4 +1,5 @@
 const { fetchAssistantResponse } = require("../modules/chatModules");
+const { dataExtraction } = require("../modules/dataExtraction");
 const { downloadFile } = require("../modules/downloadFile");
 const { fileParser } = require("../modules/fileParser");
 const { fileUpload, deleteFile } = require("../modules/fileUpload");
@@ -8,6 +9,7 @@ const { CreateThread } = require("../openaiAssistant/CreateThread");
 const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
 const path = require('path');
+const { SystemPrompt } = require("../prompt");
 
 // @ts-ignore
 /**
@@ -44,17 +46,24 @@ async function updateDocument(req) {
             throw new Error('Failed to download file.');
         }
 
-        
+
         let filePath = fileExt?.includes('.pdf') ? await pdfToDocx(outputPath, fileName) : outputPath;
-        
-        console.log("FILE EXT: ", fileExt, fileExt?.includes('.pdf'),  filePath);
-        
+
+        console.log("FILE EXT: ", fileExt, fileExt?.includes('.pdf'), filePath);
+
         // const uploadedFileId = await uploadFileToAssistant(outputPath);
         const uploadedFileId = await uploadFileToAssistant(filePath);
         if (!uploadedFileId) {
             throw new Error('Failed to upload file to OpenAI.');
         }
 
+        let extractedDataFromDocument = null;
+
+        if (!['.xlsx', '.csv', '.ods', '.xls'].includes(fileExt)) {
+            extractedDataFromDocument = await dataExtraction(uploadedFileId);
+        }
+
+        // console.log("extractedDataFromDocument: ", extractedDataFromDocument);
 
         const assistant = await updateAssistant(uploadedFileId);
 
@@ -63,7 +72,7 @@ async function updateDocument(req) {
         }
 
         let user_inputs;
-        if(data?.file){
+        if (data?.file) {
 
             const currentDocumentFile = await strapi.db.query('plugin::upload.file').findOne({
                 where: {
@@ -78,32 +87,7 @@ async function updateDocument(req) {
 
 
         const params = {
-            inputmessage: `
-            Effectuate the following:
-
-                1. Conduct a thorough, word-by-word analysis of the document identified by ID: *${uploadedFileId}* to fully grasp its content.
-                
-                2. Update the document based on the given user inputs while retaining the original design, style, font, and format.
-
-                **User Instructions for Updates:**
-                - **Title:** ${data?.title} (Maintain same font size and style)
-                - **Company Name:** ${data?.companyName} (Replace wherever found in the document)
-                - **Email:** ${data?.email} (Replace wherever found in the document)
-                - **Additional User Inputs:** ${data?.file ? user_inputs : ''}
-
-                3. Ensure that the format, design, style, and font are consistently maintained. Produce the updated document in the same ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. The new file name should be: ${removeFileExtension(fileName) + '_user_' + data?.user}.
-
-                4.Generate a 50-word description of the newly updated document in a separate message based solely on the content within the document. Do not mention the title, filename, or company name. 
-                    Message format as follows:
-                    "Description": "start description here".
-
-                **Clarifying Notes:**
-                - Follow the exact update instructions provided by the user.
-                - Ensure every modification adheres strictly to the original format specifics.
-
-                If any step or instruction needs further detail or there are uncertainties, refer back for clarification.
-            `,
-
+            inputmessage: SystemPrompt(uploadedFileId, data, fileExt, fileName, selectedTemplate, user_inputs, extractedDataFromDocument),
             fileId: uploadedFileId,
         };
         const threadId = await CreateThread(params);
@@ -165,16 +149,5 @@ async function updateDocument(req) {
         throw error;
     }
 };
-
-
-/**
- * @param {string} fileName
- */
-function removeFileExtension(fileName) {
-    const lastDotIndex = fileName.lastIndexOf('.');
-    if (lastDotIndex === -1) return fileName; // No dot found, or it's at the start, return as is
-    return fileName.substring(0, lastDotIndex);
-}
-
 
 module.exports = { updateDocument };

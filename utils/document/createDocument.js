@@ -1,4 +1,5 @@
 const { fetchAssistantResponse } = require("../modules/chatModules");
+const { dataExtraction } = require("../modules/dataExtraction");
 const { downloadFile } = require("../modules/downloadFile");
 const { fileParser } = require("../modules/fileParser");
 const { fileUpload, deleteFile } = require("../modules/fileUpload");
@@ -10,6 +11,7 @@ const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
 const { queryToOpenAi } = require("./ai");
 const { JSONLoader } = require("langchain/document_loaders/fs/json");
 const path = require('path');
+const { SystemPrompt } = require("../prompt");
 
 // @ts-ignore
 /**
@@ -36,13 +38,9 @@ async function createDocument(req) {
 
         console.log("selectedTemplate: ", selectedTemplate);
 
-        // Example usage:
         const fileUrl = selectedTemplate?.file?.url;
         const fileName = selectedTemplate?.file?.name;
         const fileExt = selectedTemplate?.file?.ext
-
-        // Fetch template details
-        // const { file: { url, name, ext } } = selectedTemplate;
 
         const outputPath = path.join(__dirname, `../../public/files/templates/${fileName}`);
 
@@ -64,7 +62,6 @@ async function createDocument(req) {
             throw new Error('Failed to upload file to OpenAI.');
         }
 
-
         const assistant = await updateAssistant(uploadedFileId);
 
         if (!assistant) {
@@ -85,88 +82,16 @@ async function createDocument(req) {
             console.log("user_inputs Text: ", user_inputs.slice(0, 50));
         }
 
+        let extractedDataFromDocument = null;
 
-        // const params = {
-        //     inputmessage: `
-        //     Please utilize the document identified by ID: *${uploadedFileId}*, applying it as a template of the type ${selectedTemplate?.type || "Annual Review Template"}. Your tasks are outlined as follows:
+        if (!['.xlsx', '.csv', '.ods', '.xls'].includes(fileExt)) {
+            extractedDataFromDocument = await dataExtraction(uploadedFileId);
+        }
 
-        //     1. Conduct a thorough, word-by-word analysis to fully grasp the document's content.
-        //     2. Upon achieving a comprehensive understanding, you are to update the document in accordance with the given user prompts.
-
-        //     User Instructions for Updates:
-        //     - Title: ${data?.title} (Should be same font size and style)
-        //     - Company Name: ${data?.companyName} (Replace it wherever found throughout the document)
-        //     - Email: ${data?.email} (Replace it wherever found throughout the document)
-
-        //     ${data?.file && user_inputs ? `-${user_inputs}` : ''}
-        //     Wherever it seems appropriate within the document, these user instructions should be incorporated or used to replace existing information.
-
-        //     It is essential to retain the original design, style, font, and format of the document.
-
-        //     Note: The document is provided in the ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. You are tasked with generating a new document in the same ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format, ensuring that the format, design, style, and font are consistently maintained and newly file named should be as ${removeFileExtension(fileName) + '_user_' + data?.user}
-
-        //     Additionally, generate a 50 word description of the newly generated document in a separate message as follows:
-        //     Description: "start description here". Just write the description based on the information found within the document only. Please don't mention information about the title, filename and company of the document.
-        //     `,
-
-        //     fileId: uploadedFileId,
-        // };
-
-        // Updated Prompt but Not working 
-        // const params = {
-        //     inputmessage: `
-        //     Please use the document identified by ID: *${uploadedFileId}* as a template (${selectedTemplate?.type || "Annual Review Template"}). Your tasks are outlined as follows:
-
-        //     1. **Locate and Replace Title:** Find the current title of the document and update it to ${data?.title}. Ensure the new title uses the same font size and style as the original.
-
-        //     2. **Locate and Replace Company Name:** Search for the company name throughout the entire document and replace every instance with ${data?.companyName}.
-
-        //     3. **Locate and Replace Email:** Search for the email throughout the entire document and replace every instance with ${data?.email}.
-
-        //     4. **Apply Additional Instructions:** ${data?.file && user_inputs ? `${user_inputs}` : ''} (Apply these changes wherever appropriate in the document).
-
-        //     **Requirements:**
-
-        //     - Apply the specified changes consistently throughout the document.
-        //     - Preserve the original design, style, font, and format.
-        //     - Save the updated document in the same format (${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext}).
-        //     - Name the new file: ${removeFileExtension(fileName) + '_user_' + data?.user}.
-
-        //     **Final Task:**
-        //     - Additionally, generate a 50-word description of the newly generated document in a separate message as follows:
-        //     Description: "start description here". Just write the description based on the information found within the document only. Please don't mention information about the title, filename, or company name of the document.
-        //     `,
-
-        //     fileId: uploadedFileId,
-        // };
+        console.log("extractedDataFromDocument: ", extractedDataFromDocument);
 
         const params = {
-            inputmessage: `
-            Effectuate the following:
-
-                1. Conduct a thorough, word-by-word analysis of the document identified by ID: *${uploadedFileId}* to fully grasp its content.
-                
-                2. Update the document based on the given user inputs while retaining the original design, style, font, and format.
-
-                **User Instructions for Updates:**
-                - **Title:** ${data?.title} (Maintain same font size and style)
-                - **Company Name:** ${data?.companyName} (Replace wherever found in the document)
-                - **Email:** ${data?.email} (Replace wherever found in the document)
-                - **Additional User Inputs:** ${data?.file ? user_inputs : ''}
-
-                3. Ensure that the format, design, style, and font are consistently maintained. Produce the updated document in the same ${fileExt?.includes('.pdf') ? 'docx' : selectedTemplate?.file?.ext} format. The new file name should be: ${removeFileExtension(fileName) + '_user_' + data?.user}.
-
-                4.Generate a 50-word description of the newly updated document in a separate message based solely on the content within the document. Do not mention the title, filename, or company name. 
-                    Message format as follows:
-                    "Description": "start description here".
-
-                **Clarifying Notes:**
-                - Follow the exact update instructions provided by the user.
-                - Ensure every modification adheres strictly to the original format specifics.
-
-                If any step or instruction needs further detail or there are uncertainties, refer back for clarification.
-            `,
-
+            inputmessage: SystemPrompt(uploadedFileId, data, fileExt, fileName, selectedTemplate, user_inputs, extractedDataFromDocument),
             fileId: uploadedFileId,
         };
         const threadId = await CreateThread(params);
@@ -228,16 +153,6 @@ async function createDocument(req) {
         throw error;
     }
 };
-
-
-/**
- * @param {string} fileName
- */
-function removeFileExtension(fileName) {
-    const lastDotIndex = fileName.lastIndexOf('.');
-    if (lastDotIndex === -1) return fileName; // No dot found, or it's at the start, return as is
-    return fileName.substring(0, lastDotIndex);
-}
 
 
 module.exports = { createDocument };

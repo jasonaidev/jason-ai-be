@@ -6,7 +6,11 @@ const openai = new OpenAI({
 });
 
 
-async function ListMessages(threadId) {
+/**
+ * @param {any} threadId
+ * @param {any} fileSearch
+ */
+async function ListMessages(threadId, fileSearch) {
     try {
         console.log("Received Thread ID: ", threadId);
         const messages = await openai.beta.threads.messages.list(threadId);
@@ -23,13 +27,13 @@ async function ListMessages(threadId) {
             for (let content of message.content) {
                 console.log(content.text.value);
                 if (content.type === 'text') {
-                    if (content.text.annotations && content.text.annotations.length > 0) {
+                    if (content.text.annotations && content.text.annotations.length > 0 && !fileSearch) {
                         const annotation = content.text.annotations[0];
                         console.log(`Annotation Text: ${annotation.text}`);
-                        console.log(`File ID: ${annotation.file_path.file_id}`);
+                        console.log(`File ID: ${annotation?.file_path?.file_id}`);
 
                         try {
-                            const annotationDataBytes = await openai.files.content(annotation.file_path.file_id);
+                            const annotationDataBytes = await openai.files.content(annotation?.file_path?.file_id);
                             const filename = annotation.text.split('/').pop();
                             const isFileSaved = await saveFile(annotationDataBytes, filename);
                             console.log("Filename: ", filename, "Saved: ", isFileSaved);
@@ -50,9 +54,12 @@ async function ListMessages(threadId) {
                         content: content.text.value
                     });
 
-                    if (message.role === 'assistant' && content.text.value.startsWith('Description:')) {
-                        description = content.text.value.substring(12).trim();
-                    }
+                    if (message.role === 'assistant') {
+                        const descriptionMatch = content.text.value.match(/Description:\s*\**(.*?)\**\s*$/);
+                        if (descriptionMatch) {
+                            description = descriptionMatch[1].trim();
+                        }
+                    }                    
                 }
             }
         }

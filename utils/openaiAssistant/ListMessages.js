@@ -55,11 +55,11 @@ async function ListMessages(threadId, fileSearch) {
                     });
 
                     if (message.role === 'assistant') {
-                        const descriptionMatch = content.text.value.match(/Description:\s*(.*)/);
+                        const descriptionMatch = content.text.value.match(/Description:\s*\**(.*?)\**\s*$/);
                         if (descriptionMatch) {
                             description = descriptionMatch[1].trim();
                         }
-                    }
+                    }                    
                 }
             }
         }

@@ -12,8 +12,8 @@ const ASSISTANT_DEFAULT_INSTRUCTIONS = `
     You should ensure that the resulting document maintains the same design, format, and styling as the original.
     `
 const ASSISTANT_NAME = "The Document Generator"
-// const ASSISTANT_MODEL = "gpt-4-1106-preview"
-const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL_NAME
+const ASSISTANT_MODEL = "gpt-4-1106-preview"
+// const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL_NAME
 const ASSISTANT_ID = process.env.DOCUMENT_GENERATOR_OPENAI_ASSISTANT_ID
 
 console.log("ASSISTANT_ID++++ AT UPDATE ASSISTANT FILE: ", ASSISTANT_ID);
@@ -101,7 +101,7 @@ async function updateAssistantForDocumentExtraction(file_id) {
         If any of the required information is not found in the document, clearly state that it is not available.
     `
     const ASSISTANT_NAME = "Document Information Extraction"
-    const ASSISTANT_MODEL = "gpt-4o-2024-05-13"
+    const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL_NAME
     const ASSISTANT_ID = process.env.Document_Information_Extraction_OPENAI_ASSISTANT_ID
 
     try {
@@ -130,12 +130,21 @@ async function updateAssistantForDocumentExtraction(file_id) {
             name: ASSISTANT_NAME,
             instructions: ASSISTANT_DEFAULT_INSTRUCTIONS,
             model: ASSISTANT_MODEL,
-            tools: [{ "type": "file_search" }],
+            tools: [{"type": "code_interpreter"}],
             tool_resources: {
-                file_search: {
-                    file_ids: files
+                "code_interpreter": {
+                  "file_ids": files
                 }
-            }
+              }
+
+
+
+            // tools: [{ "type": "file_search" }],
+            // tool_resources: {
+            //     file_search: {
+            //         file_ids: files
+            //     }
+            // }
         });
 
         // Logging the details of the created run for debugging. This includes the run ID and any other relevant information.

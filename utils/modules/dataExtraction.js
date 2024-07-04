@@ -2,11 +2,12 @@ const { CreateThread } = require("../openaiAssistant/CreateThread");
 const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { fetchAssistantResponse } = require("./chatModules");
 
-const dataExtraction = async (/** @type {any} */ uploadedFileId,) => {
+const dataExtraction = async (/** @type {any} */ uploadedFileId, /** @type {any} */ fileExt) => {
 
+    const excelFile = ['.xlsx', '.csv', '.ods', '.xls'].includes(fileExt)
     const paramsForInfoExtraction = {
         inputmessage: `
-            Review the document identified by ID: ${uploadedFileId}. Your task is to identify and extract the following details:
+            Review the ${excelFile ? fileExt : ""} document identified by ID: ${uploadedFileId}. Your task is to identify and extract the following details:
 
             - **Title:** The main title of the document.
             - **Company Name:** The full name of the company mentioned in the document.
@@ -26,7 +27,7 @@ const dataExtraction = async (/** @type {any} */ uploadedFileId,) => {
 
         `,
         fileId: uploadedFileId,
-        file_search: true,
+        code_interpretor: excelFile,
     }
 
 

@@ -19,12 +19,15 @@ const SystemPrompt = (uploadedFileId, data, fileExt, fileName, selectedTemplate,
     3. **Maintain Original Format:**
     - Ensure that the updated document retains the original design, style, font, and format. Note: Ensure that all sheets within the Excel file maintain their formatting and design elements.
 
-    4. **Output Format:**
+    4. **Template Document Format:**
+    - The document is provided in ${outputFormat} format.
+    
+    5. **Output Format:**
     - The document is provided in ${outputFormat} format.
     - Generate the updated document in the same ${outputFormat} format.
     - Name the new file as ${userFileName}.
 
-    5. **Generate Description:**
+    6. **Generate Description:**
     - Create a 50-word description of the updated document based solely on its content in a separate message.
     - Do not include details about the title, filename, or company name.
     - Message format: Description: "start description here".
@@ -51,7 +54,7 @@ const buildPrompt = (extractedDataFromDocument, data, user_inputs) => {
         ? `Replace the document's title "${extractedDataFromDocument.title}" with "${data?.title}". Ensure the new title matches the original in font size, style, and appears prominently on the first page or as the first line.`
         : `Replace the document's title with "${data?.title}". Ensure the new title matches the original in font size, style, and appears prominently on the first page or as the first line.`;
 
-        const companyAbbr = extractedDataFromDocument && !extractedDataFromDocument?.companyAbbr.includes("Not available")
+    const companyAbbr = extractedDataFromDocument && !extractedDataFromDocument?.companyAbbr.includes("Not available")
         ? `(${extractedDataFromDocument.companyAbbr})`
         : '';
 

@@ -82,17 +82,13 @@ async function createDocument(req) {
             console.log("user_inputs Text: ", user_inputs.slice(0, 50));
         }
 
-        let extractedDataFromDocument = null;
 
-        if (!['.xlsx', '.csv', '.ods', '.xls'].includes(fileExt)) {
-            extractedDataFromDocument = await dataExtraction(uploadedFileId);
-        }
-
-        console.log("extractedDataFromDocument: ", extractedDataFromDocument);
+        const extractedDataFromDocument = await dataExtraction(uploadedFileId, fileExt);
 
         const params = {
             inputmessage: SystemPrompt(uploadedFileId, data, fileExt, fileName, selectedTemplate, user_inputs, extractedDataFromDocument),
             fileId: uploadedFileId,
+            fileExt: fileExt
         };
         const threadId = await CreateThread(params);
 

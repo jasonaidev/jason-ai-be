@@ -57,13 +57,7 @@ async function updateDocument(req) {
             throw new Error('Failed to upload file to OpenAI.');
         }
 
-        let extractedDataFromDocument = null;
-
-        if (!['.xlsx', '.csv', '.ods', '.xls'].includes(fileExt)) {
-            extractedDataFromDocument = await dataExtraction(uploadedFileId);
-        }
-
-        // console.log("extractedDataFromDocument: ", extractedDataFromDocument);
+        const extractedDataFromDocument = await dataExtraction(uploadedFileId, fileExt);
 
         const assistant = await updateAssistant(uploadedFileId);
 

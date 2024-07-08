@@ -105,8 +105,6 @@ async function createDocument(req) {
 
         const assistantResponse = await fetchAssistantResponse(runId, threadId);
 
-        // console.log("assistantResponse++++: ", assistantResponse);
-
         if (!assistantResponse) {
             throw new Error('Failed to fetch assistant response.');
         }

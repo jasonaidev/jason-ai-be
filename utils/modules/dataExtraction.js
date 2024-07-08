@@ -27,7 +27,7 @@ const dataExtraction = async (/** @type {any} */ uploadedFileId, /** @type {any}
 
         `,
         fileId: uploadedFileId,
-        code_interpretor: excelFile,
+        file_search: !excelFile,
     }
 
 

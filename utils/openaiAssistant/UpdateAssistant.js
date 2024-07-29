@@ -12,7 +12,8 @@ const ASSISTANT_DEFAULT_INSTRUCTIONS = `
     You should ensure that the resulting document maintains the same design, format, and styling as the original.
     `
 const ASSISTANT_NAME = "The Document Generator"
-const ASSISTANT_MODEL = "gpt-4-1106-preview"
+const ASSISTANT_MODEL = process.env.DOCUMENT_INFORMATION_EXTRACTOR_ASSISTANT_MODEL_NAME
+// const ASSISTANT_MODEL = "gpt-4o-mini"
 // const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL_NAME
 const ASSISTANT_ID = process.env.DOCUMENT_GENERATOR_OPENAI_ASSISTANT_ID
 
@@ -102,7 +103,7 @@ async function updateAssistantForDocumentExtraction(file_id) {
     `
     const ASSISTANT_NAME = "Document Information Extraction"
     const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL_NAME
-    const ASSISTANT_ID = process.env.Document_Information_Extraction_OPENAI_ASSISTANT_ID
+    const ASSISTANT_ID = process.env.DOCUMENT_INFORMATION_EXTRACTION_OPENAI_ASSISTANT_ID
 
     try {
 

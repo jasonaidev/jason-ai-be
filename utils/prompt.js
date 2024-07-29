@@ -12,12 +12,13 @@ const SystemPrompt = (uploadedFileId, data, fileExt, fileName, selectedTemplate,
     **Task Instructions:**
 
     1. **Analyze the Document:**
-    - Review the document identified by ID: ${uploadedFileId} thoroughly to understand its content and structure.
+    - Review the document identified by ID: ${uploadedFileId} to understand its content and structure.
 
     ${instructions}
 
     3. **Maintain Original Format:**
-    - Ensure that the updated document retains the original design, style, font, and format. Note: Ensure that all sheets within the Excel file maintain their formatting and design elements.
+    - Ensure that the updated document retains the original design, style, font, and format. 
+    **Note:** Ensure that all sheets within the Excel file maintain their formatting and design elements.
 
     4. **Template Document Format:**
     - The document is provided in ${outputFormat} format.

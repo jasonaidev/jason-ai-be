@@ -14,7 +14,7 @@ async function RunAssistant(threadId, instructions, file_search) {
     try {
 
         const assistantId = process.env.DOCUMENT_GENERATOR_OPENAI_ASSISTANT_ID
-        const dataExtractionAssistantId = process.env.Document_Information_Extraction_OPENAI_ASSISTANT_ID
+        const dataExtractionAssistantId = process.env.DOCUMENT_INFORMATION_EXTRACTION_OPENAI_ASSISTANT_ID
 
 
         const run = await openai.beta.threads.runs.create(threadId, {

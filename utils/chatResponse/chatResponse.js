@@ -4,6 +4,7 @@ const {
   OpenAIAgent,
   VectorStoreIndex,
   QueryEngineTool,
+  OpenAI,
   PineconeVectorStore,
   serviceContextFromDefaults,
 } = require("llamaindex");
@@ -18,8 +19,14 @@ async function condenseChatEngine(req) {
 
   try {
 
+    // Create an OpenAI instance with the gpt-4 model
+    const llm = new OpenAI({
+      model: 'gpt-4',
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+
     const { query, chat_history } = req;
-    console.log("Receive Query at ChatController file: ", query);
+    // console.log("Receive Query at ChatController file: ", query);
 
     // Parse chat history into the role and content format fot chat engine.
     const messages = [];
@@ -69,16 +76,17 @@ async function condenseChatEngine(req) {
     const agent = new OpenAIAgent({
       tools: [queryEngineTool],
       verbose: true,
+      llm: llm,
     });
 
     // Chat with the agent
     const response = await agent.chat({
       message: query,
-      chatHistory: messages
+      chatHistory: messages,
     });
 
     // Print the response
-    console.log("Response of the BOT+++++: ", String(response));
+    // console.log("Response of the BOT+++++: ", String(response));
 
     const result = {
       user_message: query,

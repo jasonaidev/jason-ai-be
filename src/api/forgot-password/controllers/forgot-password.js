@@ -119,8 +119,7 @@ module.exports = {
     }
 
     // Update the user's password
-    // const hashedPassword = await strapi.admin.services.auth.hashPassword(newPassword);
-    const hashedPassword = await bcrypt.hash(newPassword, 10); // Use the desired number of salt rounds, e.g., 10
+    const hashedPassword = await strapi.admin.services.auth.hashPassword(newPassword);
 
 
     await strapi.db.query('plugin::users-permissions.user').update({

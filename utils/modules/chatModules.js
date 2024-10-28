@@ -1,7 +1,5 @@
-
- const { CheckRunStatus } = require("../openaiAssistant/CheckRunStatus")
- const { ListMessages } = require("../openaiAssistant/ListMessages")
-
+const { CheckRunStatus } = require("../openaiAssistant/CheckRunStatus");
+const { ListMessages } = require("../openaiAssistant/ListMessages");
 
 /**
  * @param {any} runId
@@ -11,7 +9,6 @@
 async function fetchAssistantResponse(runId, threadId, fileSearch) {
   try {
     if (runId) {
-
       const startTime = Date.now(); // Get the current time at the start
       let status;
       let fetchCount = 0; // Number of fetches so far
@@ -19,31 +16,36 @@ async function fetchAssistantResponse(runId, threadId, fileSearch) {
       do {
         const params = {
           threadId: threadId,
-          runId: runId
-        }
+          runId: runId,
+        };
         const statusData = await CheckRunStatus(params);
         status = statusData.status;
         fetchCount++; // Increment the fetch count
-        console.log("status+++++++++++++", status);
+        // console.log("status+++++++++++++", status);
 
-        if (status === 'cancelled' || status === 'cancelling' || status === 'failed' || status === 'expired') {
+        if (
+          status === "cancelled" ||
+          status === "cancelling" ||
+          status === "failed" ||
+          status === "expired"
+        ) {
           throw new Error(status);
         }
 
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Polling delay
-      } while (status !== 'completed');
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Polling delay
+      } while (status !== "completed");
     }
-
 
     const response = await ListMessages(threadId, fileSearch);
     return response;
-    
   } catch (error) {
-    if (error instanceof Error) {
-      throw error; // Re-throw the error after setting the status message
-    }
-    throw error; // Re-throw the error if it's not an instance of Error
+    console.log("error occured in fetch assistant response fc, ", error);
+    return {};
+    // if (error instanceof Error) {
+    //   throw error; // Re-throw the error after setting the status message
+    // }
+    // throw error; // Re-throw the error if it's not an instance of Error
   }
-};
+}
 
-module.exports = { fetchAssistantResponse }
+module.exports = { fetchAssistantResponse };

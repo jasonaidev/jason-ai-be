@@ -758,6 +758,42 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
   };
 }
 
+export interface ApiFieldTypeFieldType extends Schema.CollectionType {
+  collectionName: 'field_types';
+  info: {
+    singularName: 'field-type';
+    pluralName: 'field-types';
+    displayName: 'Field_type';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    text: Attribute.String;
+    general: Attribute.Boolean;
+    user: Attribute.Relation<
+      'api::field-type.field-type',
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::field-type.field-type',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::field-type.field-type',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiForgotPasswordForgotPassword extends Schema.CollectionType {
   collectionName: 'forgot_passwords';
   info: {
@@ -889,6 +925,7 @@ declare module '@strapi/types' {
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'api::chat.chat': ApiChatChat;
       'api::document.document': ApiDocumentDocument;
+      'api::field-type.field-type': ApiFieldTypeFieldType;
       'api::forgot-password.forgot-password': ApiForgotPasswordForgotPassword;
       'api::message.message': ApiMessageMessage;
       'api::policy-template.policy-template': ApiPolicyTemplatePolicyTemplate;

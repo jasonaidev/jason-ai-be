@@ -131,7 +131,7 @@ async function createDocument(req) {
           throw new Error("RunId is null");
         }
         assistantResponse = await fetchAssistantResponse(runId, threadId);
-        console.log("files are: ", assistantResponse?.filenames);
+        // console.log("files are: ", assistantResponse?.filenames);
         if (assistantResponse?.filenames?.length > 0) break;
       } catch (error) {
         console.error(
@@ -166,11 +166,13 @@ async function createDocument(req) {
       retryCount++;
     }
 
-    console.log("Res of Upload: ", fileResponse);
+    // console.log("Res of Upload: ", fileResponse);
 
     if (!fileResponse) {
       throw new Error("Failed to upload file response or invalid response ID.");
     }
+
+    console.log("this is the assistantResponse", assistantResponse);
 
     const entry = await strapi.entityService.update(
       "api::document.document",

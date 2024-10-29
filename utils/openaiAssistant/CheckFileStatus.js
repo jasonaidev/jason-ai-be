@@ -16,11 +16,11 @@ async function CheckFileStatus(file_id) {
       const file = await openai.files.retrieve(file_id);
 
       // Log the file status
-      console.log("Current file status:", file.status);
+      // console.log("Current file status:", file.status);
 
       // Check if the status is "processed"
       if (file.status === "processed") {
-        console.log("File is processed.");
+        // console.log("File is processed.");
         status = true;
         break; // Exit the loop if the status is "processed"
       }
@@ -36,7 +36,7 @@ async function CheckFileStatus(file_id) {
     attempt++; // Increment the attempt counter
 
     // Log retry attempt
-    console.log(`Retry attempt: ${attempt}`);
+    // console.log(`Retry attempt: ${attempt}`);
   }
 
   if (!status) {

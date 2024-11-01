@@ -740,6 +740,7 @@ export interface ApiDocumentDocument extends Schema.CollectionType {
       'api::policy-template.policy-template'
     >;
     conversation: Attribute.JSON;
+    media: Attribute.Media;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

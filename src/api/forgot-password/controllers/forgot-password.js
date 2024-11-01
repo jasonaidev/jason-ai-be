@@ -69,7 +69,7 @@ module.exports = {
         },
       });
 
-    const sender_link = `${process.env.WEBSITE_URL}/reset-password/?token=${resetCode}`;
+    const sender_link = `${process.env.WEBSITE_URL}/reset-password/?token=${resetCode}`
 
     // Implement your email sending logic here to send the reset code
     // Example: await sendResetCodeEmail(user.email, resetCode);

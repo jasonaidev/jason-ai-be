@@ -18,7 +18,7 @@ const SystemPrompt = (uploadedFileId, data, fileExt, fileName, selectedTemplate,
 
     3. **Maintain Original Format:**
     - Ensure that the updated document retains the original design, style, font, and format. 
-    **Note:** Ensure that all sheets within the Excel file maintain their formatting and design elements.
+    **Note:** Ensure that all sheets within the Excel file maintain their formatting and design elements, ensure the formatting remains the same. 
 
     4. **Template Document Format:**
     - The document is provided in ${outputFormat} format.

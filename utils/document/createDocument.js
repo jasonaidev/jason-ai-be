@@ -87,7 +87,6 @@ async function createDocument(req) {
         });
 
       user_inputs = await fileParser(currentDocumentFile?.url);
-
       // console.log("user_inputs Text: ", user_inputs.slice(0, 50));
     }
 

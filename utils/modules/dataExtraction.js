@@ -20,11 +20,10 @@ const dataExtraction = async (/** @type {any} */ uploadedFileId, /** @type {any}
             
             title: Extracted Title
             companyName: Extracted Company Name
-            companyAbbreviations: ["Extracted Company Abbreviations",]
+            companyAbbreviations: ["Extracted Company Abbreviations"]
             companyEmail: Extracted Company Email
 
             Note: Always give the result in the above format only. Do not provide anything else.
-
         `,
         fileId: uploadedFileId,
         file_search: !excelFile,
@@ -64,7 +63,7 @@ const dataExtraction = async (/** @type {any} */ uploadedFileId, /** @type {any}
                 }
             }
         }
-        return 'Not available';
+        return 'Not available';  
     };    
     
     const title = extractDetailFromConversation('title');

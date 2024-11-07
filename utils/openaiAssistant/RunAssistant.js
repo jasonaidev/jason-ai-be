@@ -23,7 +23,7 @@ async function RunAssistant(threadId, instructions, file_search) {
         });
 
         // Logging the details of the created run for debugging. This includes the run ID and any other relevant information.
-        console.log(`run: ${JSON.stringify(run)}`);
+        // console.log(`run: ${JSON.stringify(run)}`);
 
         // Responding with the run ID in JSON format. This ID can be used for further operations
         // such as retrieving the run's output or continuing the conversation.

@@ -20,14 +20,18 @@
     "@strapi/strapi": "4.14.4",
     "axios": "^1.6.7",
     "better-sqlite3": "8.6.0",
+    "docx": "^9.0.2",
     "form-data": "^4.0.0",
     "langchain": "^0.1.21",
     "llamaindex": "0.1.11",
     "openai": "^4.51.0",
     "path": "^0.12.7",
+    "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.1",
+    "pdf.js-extract": "^0.2.1",
     "pg": "^8.11.3",
-    "pg-connection-string": "^2.6.2"
+    "pg-connection-string": "^2.6.2",
+    "xlsx": "^0.18.5"
   },
   "author": {
     "name": "A Strapi developer"

@@ -13,6 +13,7 @@ const { JSONLoader } = require("langchain/document_loaders/fs/json");
 const path = require("path");
 const { SystemPrompt } = require("../prompt");
 const { CheckFileStatus } = require("../openaiAssistant/CheckFileStatus");
+const { applyTemplateFormatting } = require("./applytemplateformatting");
 
 // @ts-ignore
 /**
@@ -23,6 +24,7 @@ async function createDocument(req) {
     const { data } = req;
     // console.log("Receive Query Params: ", data);
 
+    // get the selected template
     const selectedTemplate = await strapi.db
       .query("api::policy-template.policy-template")
       .findOne({
@@ -46,17 +48,20 @@ async function createDocument(req) {
     const fileName = selectedTemplate?.file?.name;
     const fileExt = selectedTemplate?.file?.ext;
 
+    // get the templates from the local template folder
     const outputPath = path.join(
       __dirname,
       `../../public/files/templates/${fileName}`
     );
 
+    // download the template from the local template folder
     const fileStatus = await downloadFile(fileUrl, outputPath);
 
     if (!fileStatus) {
       throw new Error("Failed to download file.");
     }
 
+    // if the file extension is pdf chnage it to docx
     let filePath = fileExt?.includes(".pdf")
       ? await pdfToDocx(outputPath, fileName)
       : outputPath;
@@ -64,6 +69,7 @@ async function createDocument(req) {
     // console.log("FILE EXT: ", fileExt, fileExt?.includes(".pdf"), filePath);
 
     // const uploadedFileId = await uploadFileToAssistant(outputPath);
+    // upload file to fileToAssistant
     const uploadedFileId = await uploadFileToAssistant(filePath);
     const file_status = await CheckFileStatus(uploadedFileId);
     if (!uploadedFileId || !file_status) {
@@ -90,11 +96,13 @@ async function createDocument(req) {
       // console.log("user_inputs Text: ", user_inputs.slice(0, 50));
     }
 
+    // extract data from the template using the uploadedFileId
     const extractedDataFromDocument = await dataExtraction(
       uploadedFileId,
       fileExt
     );
 
+    // initialize the system prompt, based on the extractedData from document
     const params = {
       inputmessage: SystemPrompt(
         uploadedFileId,
@@ -129,6 +137,7 @@ async function createDocument(req) {
         if (runId === null) {
           throw new Error("RunId is null");
         }
+        // run the system prompt etc
         assistantResponse = await fetchAssistantResponse(runId, threadId);
         // console.log("files are: ", assistantResponse?.filenames);
         if (assistantResponse?.filenames?.length > 0) break;

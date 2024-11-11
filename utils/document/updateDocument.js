@@ -13,11 +13,36 @@ const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
 const path = require("path");
 const { SystemPrompt } = require("../prompt");
-
+const { replaceInDocx } = require("./replace-text");
+const fs = require("fs").promises;
 // @ts-ignore
 /**
  * @param {{ data: any; }} req
  */
+
+function parseArrayString(str) {
+  try {
+    // Remove the outer brackets and split by commas
+    const cleanedStr = str.slice(1, -1).trim(); // Remove the first and last characters (brackets)
+
+    // Split the string by commas and add quotes around each item
+    const array = cleanedStr.split(",").map((item) => `"${item.trim()}"`);
+
+    // Join the array items into a valid JSON string and parse it
+    return JSON.parse(`[${array.join(", ")}]`);
+  } catch (e) {
+    console.error("Error parsing string:", e);
+    return str; // Return the original string if it can't be parsed
+  }
+}
+
+async function ensureOutputDirectory() {
+  const outputDir = path.join(__dirname, `../../public/files/outputs`);
+  await fs.mkdir(outputDir, { recursive: true });
+  return outputDir;
+}
+
+
 async function updateDocument(req) {
   try {
     const { data } = req;
@@ -40,8 +65,6 @@ async function updateDocument(req) {
       throw new Error("Template or file URL not found.");
     }
 
-    console.log("selectedTemplate: ", selectedTemplate);
-
     // Example usage:
     const fileUrl = selectedTemplate?.file?.url;
     const fileName = selectedTemplate?.file?.name;
@@ -62,8 +85,6 @@ async function updateDocument(req) {
       ? await pdfToDocx(outputPath, fileName)
       : outputPath;
 
-    console.log("FILE EXT: ", fileExt, fileExt?.includes(".pdf"), filePath);
-
     // const uploadedFileId = await uploadFileToAssistant(outputPath);
     const uploadedFileId = await uploadFileToAssistant(filePath);
     if (!uploadedFileId) {
@@ -72,7 +93,8 @@ async function updateDocument(req) {
 
     const extractedDataFromDocument = await dataExtraction(
       uploadedFileId,
-      fileExt
+      fileExt,
+      data?.companyName
     );
 
     const assistant = await updateAssistant(uploadedFileId);
@@ -81,59 +103,78 @@ async function updateDocument(req) {
       throw new Error("Failed to update assistant with new file.");
     }
 
-    let user_inputs;
-    if (data?.file) {
-      const currentDocumentFile = await strapi.db
-        .query("plugin::upload.file")
-        .findOne({
-          where: {
-            id: data?.file,
-          },
-        });
+    const outputDir = await ensureOutputDirectory();
+    const outputFilePath = path.join(
+      outputDir,
+      `user_${data?.user}_${path.basename(filePath)}`
+    );
+    await fs.copyFile(filePath, outputFilePath);
 
-      user_inputs = await fileParser(currentDocumentFile?.url);
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-      console.log("user_inputs Text: ", user_inputs.slice(0, 50));
-    }
+    try {
+      if (
+        fileExt?.includes(".pdf") ||
+        fileExt?.includes(".docx") ||
+        fileExt?.includes(".xlsx")
+      ) {
+        if (extractedDataFromDocument?.title) {
+          const insertDocs = await replaceInDocx(
+            outputFilePath,
+            [extractedDataFromDocument?.title],
+            data?.title
+          );
+        }
 
-    const params = {
-      inputmessage: SystemPrompt(
-        uploadedFileId,
-        data,
-        fileExt,
-        fileName,
-        selectedTemplate,
-        user_inputs,
-        extractedDataFromDocument
-      ),
-      fileId: uploadedFileId,
-    };
-    const threadId = await CreateThread(params);
+        if (
+          parseArrayString(extractedDataFromDocument?.companyName)?.length > 0
+        ) {
+          const insertDocss = await replaceInDocx(
+            outputFilePath,
+            parseArrayString(extractedDataFromDocument?.companyName),
+            data?.companyName
+          );
+        }
 
-    if (threadId === null) {
-      throw new Error("ThreadId is null");
-    }
+        if (
+          parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
+        ) {
+          const insertDocsss = await replaceInDocx(
+            outputFilePath,
+            parseArrayString(extractedDataFromDocument?.companyAbbr),
+            extractedDataFromDocument?.userAbb
+          );
+        }
 
-    const runId = await RunAssistant(threadId, params.inputmessage);
+        if (
+          parseArrayString(extractedDataFromDocument?.companyEmail)?.length > 0
+        ) {
+          const insertDocssss = await replaceInDocx(
+            outputFilePath,
+            parseArrayString(extractedDataFromDocument?.companyEmail),
+            data?.email
+          );
+        }
 
-    if (runId === null) {
-      throw new Error("RunId is null");
-    }
-
-    const assistantResponse = await fetchAssistantResponse(runId, threadId);
-
-    console.log("assistantResponse++++: ", assistantResponse);
-
-    if (!assistantResponse) {
-      throw new Error("Failed to fetch assistant response.");
+        console.log("this is the insertDocs", insertDocs);
+      }
+    } catch (error) {
+      console.error("Error in replaceInDocx: ", error);
     }
 
     let fileResponse;
-    if (assistantResponse?.filenames?.length > 0) {
-      fileResponse = await fileUpload(assistantResponse?.filenames, fileExt);
+    try {
+      fileResponse = await fileUpload(
+        outputFilePath,
+        `user_${data?.user}_${path.basename(filePath)}`,
+        fileExt
+      );
+    } catch (error) {
+      console.error(
+        `File upload failed, retrying... (${retryCount + 1}/${maxRetries})`,
+        error
+      );
     }
-
-    console.log("Res of Upload: ", fileResponse);
 
     if (!fileResponse) {
       throw new Error("Failed to upload file response or invalid response ID.");
@@ -145,9 +186,9 @@ async function updateDocument(req) {
       {
         data: {
           file: fileResponse?.id,
-          conversation: assistantResponse?.messagesList,
+          // conversation: assistantResponse?.messagesList,
+          description: extractedDataFromDocument?.description,
           updatedAt: new Date(),
-          description: assistantResponse?.description,
         },
         populate: "*",
       }
@@ -156,9 +197,10 @@ async function updateDocument(req) {
     console.log("Entry Saved into the DB+++ ", entry);
 
     // Delete Files
-    await deleteFileFromAssistant(data?.openAiFileId);
+    await deleteFileFromAssistant(uploadedFileId);
+    // await deleteFileFromAssistant(data?.openAiFileId);
 
-    await deleteFile(assistantResponse?.filenames);
+    await deleteFile(`user_${data?.user}_${path.basename(filePath)}`);
 
     return entry;
   } catch (error) {

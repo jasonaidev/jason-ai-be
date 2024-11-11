@@ -13,7 +13,7 @@ const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
 const path = require("path");
 const { SystemPrompt } = require("../prompt");
-const { replaceInDocx } = require("./replace-text");
+const { replaceInDocx, replaceInDocument } = require("./replace-text");
 const fs = require("fs").promises;
 // @ts-ignore
 /**
@@ -41,7 +41,6 @@ async function ensureOutputDirectory() {
   await fs.mkdir(outputDir, { recursive: true });
   return outputDir;
 }
-
 
 async function updateDocument(req) {
   try {
@@ -119,7 +118,7 @@ async function updateDocument(req) {
         fileExt?.includes(".xlsx")
       ) {
         if (extractedDataFromDocument?.title) {
-          const insertDocs = await replaceInDocx(
+          const insertDocs = await replaceInDocument(
             outputFilePath,
             [extractedDataFromDocument?.title],
             data?.title
@@ -129,7 +128,7 @@ async function updateDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyName)?.length > 0
         ) {
-          const insertDocss = await replaceInDocx(
+          const insertDocss = await replaceInDocument(
             outputFilePath,
             parseArrayString(extractedDataFromDocument?.companyName),
             data?.companyName
@@ -139,7 +138,7 @@ async function updateDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
         ) {
-          const insertDocsss = await replaceInDocx(
+          const insertDocsss = await replaceInDocument(
             outputFilePath,
             parseArrayString(extractedDataFromDocument?.companyAbbr),
             extractedDataFromDocument?.userAbb
@@ -149,7 +148,7 @@ async function updateDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyEmail)?.length > 0
         ) {
-          const insertDocssss = await replaceInDocx(
+          const insertDocssss = await replaceInDocument(
             outputFilePath,
             parseArrayString(extractedDataFromDocument?.companyEmail),
             data?.email

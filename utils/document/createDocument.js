@@ -17,7 +17,7 @@ const path = require("path");
 const { SystemPrompt } = require("../prompt.js");
 const { CheckFileStatus } = require("../openaiAssistant/CheckFileStatus.js");
 const { applyTemplateFormatting } = require("./applytemplateformatting.js");
-const { replaceInDocx } = require("./replace-text.js");
+const { replaceInDocx, replaceInDocument } = require("./replace-text.js");
 const fs = require("fs").promises;
 
 // @ts-ignore
@@ -129,7 +129,7 @@ async function createDocument(req) {
         fileExt?.includes(".xlsx")
       ) {
         if (extractedDataFromDocument?.title) {
-          const insertDocs = await replaceInDocx(
+          const insertDocs = await replaceInDocument(
             outputFilePath,
             [extractedDataFromDocument?.title],
             data?.title
@@ -139,7 +139,7 @@ async function createDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyName)?.length > 0
         ) {
-          const insertDocss = await replaceInDocx(
+          const insertDocss = await replaceInDocument(
             outputFilePath,
             parseArrayString(extractedDataFromDocument?.companyName),
             data?.companyName
@@ -149,7 +149,7 @@ async function createDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
         ) {
-          const insertDocsss = await replaceInDocx(
+          const insertDocsss = await replaceInDocument(
             outputFilePath,
             parseArrayString(extractedDataFromDocument?.companyAbbr),
             extractedDataFromDocument?.userAbb
@@ -159,7 +159,7 @@ async function createDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyEmail)?.length > 0
         ) {
-          const insertDocssss = await replaceInDocx(
+          const insertDocssss = await replaceInDocument(
             outputFilePath,
             parseArrayString(extractedDataFromDocument?.companyEmail),
             data?.email

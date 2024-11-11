@@ -14,7 +14,7 @@ const dataExtraction = async (
               excelFile ? fileExt : ""
             } document identified by ID: ${uploadedFileId}. Your task is to identify and extract the following details:
 
-            - **Title:** The header in the document, not the name of the document, but the header title inside the document(e.g ) the first heading (e.g G-1 Third-Party Vendor Management Component etc).
+            - **Title:** The header in the document, not the name of the document, but the header title inside the document(e.g ) the first heading (e.g G-1 Third-Party Vendor Management Component etc), the header title is normally on the first row or the first thing you see bold in the content of the document.
             - **Company Name:** The full name of the company mentioned in the document, or if there is any text/placeholders like insert company name, company name etc.
             - **Company Abbreviations:** Every abbreviations used for the company name within the document, every (both uppercase and lowercase, every one of it, for example if there is iCW and ICW for iCreditWorks, add both to it (iCW, ICW) etc).
             - **Company Email:** The email address associated with the company mentioned in the document, or if there is any text/placeholders like insert company email, company email etc, put it in the array.

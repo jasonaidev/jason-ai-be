@@ -1,7 +1,7 @@
 'use strict';
 
-const { createDocument } = require("../../../../utils/document/createDocument");
-const { updateDocument } = require("../../../../utils/document/updateDocument");
+const { createDocument } = require("../../../../utils/document/createDocument.js");
+const { updateDocument } = require("../../../../utils/document/updateDocument.js");
 
 /**
  * Controller to manage document creation or updating.

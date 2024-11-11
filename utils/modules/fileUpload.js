@@ -8,12 +8,7 @@ const { waitForFile } = require('../services/waitForFile');
  * @param {any[]} fileNames
  * @param {string | string[]} fileExt
  */
-async function fileUpload(fileNames, fileExt) {
-
-    let fileName = fileNames[0]
-    // const fileName = fileNames
-    // The path to the file you want to upload
-    let filePath = path.join(__dirname, `../../public/files/outputs/${fileName}`);
+async function fileUpload(filePath, fileName, fileExt) {
 
     try {
         // Ensure the file exists
@@ -56,12 +51,7 @@ async function fileUpload(fileNames, fileExt) {
 /**
  * @param {any} fileNames
  */
-async function deleteFile(fileNames) {
-    if (!fileNames || fileNames.length === 0) {
-        throw new Error("No file names provided.");
-    }
-
-    let fileName = fileNames[0];  // Assuming the intent is to always handle the first file
+async function deleteFile(fileName) {
     let filePath = path.join(__dirname, `../../public/files/outputs/${fileName}`);
 
     try {

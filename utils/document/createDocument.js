@@ -1,24 +1,50 @@
-const { fetchAssistantResponse } = require("../modules/chatModules");
-const { dataExtraction } = require("../modules/dataExtraction");
-const { downloadFile } = require("../modules/downloadFile");
-const { fileParser } = require("../modules/fileParser");
-const { fileUpload, deleteFile } = require("../modules/fileUpload");
-const { pdfToDocx } = require("../modules/pdfToDocx");
-const { uploadFileToAssistant } = require("../openaiAssistant/CreateFile");
-const { CreateThread } = require("../openaiAssistant/CreateThread");
-const { RunAssistant } = require("../openaiAssistant/RunAssistant");
-const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
-const { queryToOpenAi } = require("./ai");
+const { fetchAssistantResponse } = require("../modules/chatModules.js");
+const { dataExtraction } = require("../modules/dataExtraction.js");
+const { downloadFile } = require("../modules/downloadFile.js");
+const { fileParser } = require("../modules/fileParser.js");
+const { fileUpload, deleteFile } = require("../modules/fileUpload.js");
+const { pdfToDocx } = require("../modules/pdfToDocx.js");
+const {
+  uploadFileToAssistant,
+  deleteFileFromAssistant,
+} = require("../openaiAssistant/CreateFile.js");
+const { CreateThread } = require("../openaiAssistant/CreateThread.js");
+const { RunAssistant } = require("../openaiAssistant/RunAssistant.js");
+const { updateAssistant } = require("../openaiAssistant/UpdateAssistant.js");
+const { queryToOpenAi } = require("./ai.js");
 const { JSONLoader } = require("langchain/document_loaders/fs/json");
 const path = require("path");
-const { SystemPrompt } = require("../prompt");
-const { CheckFileStatus } = require("../openaiAssistant/CheckFileStatus");
-const { applyTemplateFormatting } = require("./applytemplateformatting");
+const { SystemPrompt } = require("../prompt.js");
+const { CheckFileStatus } = require("../openaiAssistant/CheckFileStatus.js");
+const { applyTemplateFormatting } = require("./applytemplateformatting.js");
+const { replaceInDocx } = require("./replace-text.js");
+const fs = require("fs").promises;
 
 // @ts-ignore
-/**
- * @param {{ data: any; }} req
- */
+/*** @param {{ data: any; }} req*/
+
+function parseArrayString(str) {
+  try {
+    // Remove the outer brackets and split by commas
+    const cleanedStr = str.slice(1, -1).trim(); // Remove the first and last characters (brackets)
+
+    // Split the string by commas and add quotes around each item
+    const array = cleanedStr.split(",").map((item) => `"${item.trim()}"`);
+
+    // Join the array items into a valid JSON string and parse it
+    return JSON.parse(`[${array.join(", ")}]`);
+  } catch (e) {
+    console.error("Error parsing string:", e);
+    return str; // Return the original string if it can't be parsed
+  }
+}
+
+async function ensureOutputDirectory() {
+  const outputDir = path.join(__dirname, `../../public/files/outputs`);
+  await fs.mkdir(outputDir, { recursive: true });
+  return outputDir;
+}
+
 async function createDocument(req) {
   try {
     const { data } = req;
@@ -66,8 +92,6 @@ async function createDocument(req) {
       ? await pdfToDocx(outputPath, fileName)
       : outputPath;
 
-    // console.log("FILE EXT: ", fileExt, fileExt?.includes(".pdf"), filePath);
-
     // const uploadedFileId = await uploadFileToAssistant(outputPath);
     // upload file to fileToAssistant
     const uploadedFileId = await uploadFileToAssistant(filePath);
@@ -82,96 +106,83 @@ async function createDocument(req) {
       throw new Error("Failed to update assistant with new file.");
     }
 
-    let user_inputs;
-    if (data?.file) {
-      const currentDocumentFile = await strapi.db
-        .query("plugin::upload.file")
-        .findOne({
-          where: {
-            id: data?.file,
-          },
-        });
-
-      user_inputs = await fileParser(currentDocumentFile?.url);
-      // console.log("user_inputs Text: ", user_inputs.slice(0, 50));
-    }
-
     // extract data from the template using the uploadedFileId
     const extractedDataFromDocument = await dataExtraction(
       uploadedFileId,
-      fileExt
+      fileExt,
+      data?.companyName
     );
 
-    // initialize the system prompt, based on the extractedData from document
-    const params = {
-      inputmessage: SystemPrompt(
-        uploadedFileId,
-        data,
-        fileExt,
-        fileName,
-        selectedTemplate,
-        user_inputs,
-        extractedDataFromDocument
-      ),
-      fileId: uploadedFileId,
-      fileExt: fileExt,
-    };
-
-    // const assistantResponse = await fetchAssistantResponse(runId, threadId);
+    const outputDir = await ensureOutputDirectory();
+    const outputFilePath = path.join(
+      outputDir,
+      `user_${data?.user}_${path.basename(filePath)}`
+    );
+    await fs.copyFile(filePath, outputFilePath);
 
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-    let assistantResponse;
-    let _retryCount = 0;
-
-    while (_retryCount < 10) {
-      try {
-        const threadId = await CreateThread(params);
-
-        if (threadId === null) {
-          throw new Error("ThreadId is null");
-        }
-
-        const runId = await RunAssistant(threadId, params.inputmessage);
-
-        if (runId === null) {
-          throw new Error("RunId is null");
-        }
-        // run the system prompt etc
-        assistantResponse = await fetchAssistantResponse(runId, threadId);
-        // console.log("files are: ", assistantResponse?.filenames);
-        if (assistantResponse?.filenames?.length > 0) break;
-      } catch (error) {
-        console.error(
-          `File upload failed, retrying... (${_retryCount + 1}/${10})`,
-          error
-        );
-      }
-      await delay(2000);
-      _retryCount++;
-    }
-
-    if (!assistantResponse) {
-      throw new Error("Failed to fetch assistant response.");
-    }
-
-    let fileResponse = null;
-    let retryCount = 0;
-    const maxRetries = 10;
-
-    while (fileResponse === null && retryCount < maxRetries) {
-      if (assistantResponse?.filenames?.length > 0) {
-        try {
-          fileResponse = await fileUpload(assistantResponse.filenames, fileExt);
-        } catch (error) {
-          console.error(
-            `File upload failed, retrying... (${retryCount + 1}/${maxRetries})`,
-            error
+    try {
+      if (
+        fileExt?.includes(".pdf") ||
+        fileExt?.includes(".docx") ||
+        fileExt?.includes(".xlsx")
+      ) {
+        if (extractedDataFromDocument?.title) {
+          const insertDocs = await replaceInDocx(
+            outputFilePath,
+            [extractedDataFromDocument?.title],
+            data?.title
           );
         }
+
+        if (
+          parseArrayString(extractedDataFromDocument?.companyName)?.length > 0
+        ) {
+          const insertDocss = await replaceInDocx(
+            outputFilePath,
+            parseArrayString(extractedDataFromDocument?.companyName),
+            data?.companyName
+          );
+        }
+
+        if (
+          parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
+        ) {
+          const insertDocsss = await replaceInDocx(
+            outputFilePath,
+            parseArrayString(extractedDataFromDocument?.companyAbbr),
+            extractedDataFromDocument?.userAbb
+          );
+        }
+
+        if (
+          parseArrayString(extractedDataFromDocument?.companyEmail)?.length > 0
+        ) {
+          const insertDocssss = await replaceInDocx(
+            outputFilePath,
+            parseArrayString(extractedDataFromDocument?.companyEmail),
+            data?.email
+          );
+        }
+
+        console.log("this is the insertDocs", insertDocs);
       }
-      await delay(2000);
-      retryCount++;
+    } catch (error) {
+      console.error("Error in replaceInDocx: ", error);
+    }
+
+    try {
+      fileResponse = await fileUpload(
+        outputFilePath,
+        `user_${data?.user}_${path.basename(filePath)}`,
+        fileExt
+      );
+    } catch (error) {
+      console.error(
+        `File upload failed, retrying... (${retryCount + 1}/${maxRetries})`,
+        error
+      );
     }
 
     // console.log("Res of Upload: ", fileResponse);
@@ -180,26 +191,23 @@ async function createDocument(req) {
       throw new Error("Failed to upload file response or invalid response ID.");
     }
 
-    console.log("this is the assistantResponse", assistantResponse);
-
     const entry = await strapi.entityService.update(
       "api::document.document",
       data.id,
       {
         data: {
           file: fileResponse?.id,
-          conversation: assistantResponse?.messagesList,
-          description: assistantResponse?.description,
+          // conversation: assistantResponse?.messagesList,
+          description: extractedDataFromDocument?.description,
           updatedAt: new Date(),
         },
         populate: "*",
       }
     );
 
-    console.log("Entry Saved into the DB+++ ", entry);
+    await deleteFileFromAssistant(uploadedFileId);
 
-    // Delete Files
-    await deleteFile(assistantResponse?.filenames);
+    await deleteFile(`user_${data?.user}_${path.basename(filePath)}`);
 
     return entry;
   } catch (error) {

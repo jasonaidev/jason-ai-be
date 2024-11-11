@@ -28,7 +28,7 @@ const dataExtraction = async (
             companyName: [Extracted Company Name]
             companyAbbreviations: [Extracted Company Abbreviations]
             companyEmail: [Extracted Company Email]
-            description: Extracted Description
+            description: Extracted Description  
             userAbb : Extracted User Abbreviation
             
 

@@ -139,31 +139,43 @@ async function createDocument(req) {
         if (
           parseArrayString(extractedDataFromDocument?.companyName)?.length > 0
         ) {
-          const insertDocss = await replaceInDocument(
-            outputFilePath,
-            parseArrayString(extractedDataFromDocument?.companyName),
-            data?.companyName
-          );
+          for (com of parseArrayString(
+            extractedDataFromDocument?.companyName
+          )) {
+            const insertDocss = await replaceInDocument(
+              outputFilePath,
+              [com],
+              data?.companyName
+            );
+          }
         }
 
         if (
           parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
         ) {
-          const insertDocsss = await replaceInDocument(
-            outputFilePath,
-            parseArrayString(extractedDataFromDocument?.companyAbbr),
-            extractedDataFromDocument?.userAbb
-          );
+          for (com of parseArrayString(
+            extractedDataFromDocument?.companyAbbr
+          )) {
+            const insertDocsss = await replaceInDocument(
+              outputFilePath,
+              [com],
+              extractedDataFromDocument?.userAbb
+            );
+          }
         }
 
         if (
           parseArrayString(extractedDataFromDocument?.companyEmail)?.length > 0
         ) {
-          const insertDocssss = await replaceInDocument(
-            outputFilePath,
-            parseArrayString(extractedDataFromDocument?.companyEmail),
-            data?.email
-          );
+          for (com of parseArrayString(
+            extractedDataFromDocument?.companyEmail
+          )) {
+            const insertDocssss = await replaceInDocument(
+              outputFilePath,
+              [com],
+              data?.email
+            );
+          }
         }
 
         console.log("this is the insertDocs", insertDocs);

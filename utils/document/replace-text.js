@@ -1,8 +1,11 @@
 const fs = require("fs").promises;
 const PizZip = require("pizzip");
 const Docxtemplater = require("docxtemplater");
+const ExcelJS = require("exceljs");
+// const XLSX = require("xlsx");
 
-async function replaceInDocx(filePath, targetWords, replacementWord) {
+async function replaceInDocument(filePath, targetWords, replacementWord) {
+  // Validate inputs
   if (
     !targetWords ||
     !Array.isArray(targetWords) ||
@@ -10,9 +13,22 @@ async function replaceInDocx(filePath, targetWords, replacementWord) {
     (targetWords.length === 1 && targetWords[0] === "")
   ) {
     console.log("No valid target words provided, skipping replacement");
-    return filePath; // Return the original file path without modifications
+    return filePath;
   }
-  
+
+  // Determine file type and process accordingly
+  if (filePath.toLowerCase().endsWith(".xlsx")) {
+    return await replaceInXlsx(filePath, targetWords, replacementWord);
+  } else if (filePath.toLowerCase().endsWith(".docx")) {
+    return await replaceInDocx(filePath, targetWords, replacementWord);
+  } else {
+    throw new Error(
+      "Unsupported file type. Only .docx and .xlsx files are supported."
+    );
+  }
+}
+
+async function replaceInDocx(filePath, targetWords, replacementWord) {
   try {
     console.log("Processing file:", { filePath, targetWords, replacementWord });
 
@@ -91,6 +107,103 @@ async function replaceInDocx(filePath, targetWords, replacementWord) {
   }
 }
 
+async function replaceInXlsx(filePath, targetWords, replacementWord) {
+  try {
+    console.log("Processing XLSX:", { filePath, targetWords, replacementWord });
+
+    // Filter out empty strings
+    const validTargetWords = targetWords.filter(
+      (word) => word && word.trim() !== ""
+    );
+    if (validTargetWords.length === 0) {
+      return filePath;
+    }
+
+    // Load workbook
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(filePath);
+
+    let replacementsMade = false;
+
+    // Process each worksheet
+    workbook.worksheets.forEach((worksheet) => {
+      // Process each row
+      worksheet.eachRow((row) => {
+        // Process each cell in the row
+        row.eachCell({ includeEmpty: false }, (cell) => {
+          // Get cell value safely
+          let cellValue = "";
+
+          // Handle different cell types
+          switch (cell.type) {
+            case ExcelJS.ValueType.String:
+              cellValue = cell.text || "";
+              break;
+            case ExcelJS.ValueType.Number:
+              cellValue = cell.value?.toString() || "";
+              break;
+            case ExcelJS.ValueType.Formula:
+              // Get the result of the formula
+              cellValue = cell.result?.toString() || "";
+              break;
+            default:
+              // For other types (Date, Error, etc.), convert to string if possible
+              cellValue = cell.value?.toString() || "";
+          }
+
+          if (cellValue) {
+            let newValue = cellValue;
+            let modified = false;
+
+            // Replace each target word
+            validTargetWords.forEach((target) => {
+              if (target && newValue.includes(target)) {
+                // Use regex to replace all instances while preserving case
+                const regex = new RegExp(
+                  target.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+                  "g"
+                );
+                newValue = newValue.replace(regex, replacementWord);
+                modified = true;
+              }
+            });
+
+            // Update cell if changes were made
+            if (modified) {
+              // Preserve formulas if present
+              if (cell.type === ExcelJS.ValueType.Formula) {
+                // Only update formula result if needed
+                if (cell.result?.toString() !== newValue) {
+                  cell.value = {
+                    formula: cell.formula,
+                    result: newValue,
+                  };
+                }
+              } else {
+                cell.value = newValue;
+              }
+              replacementsMade = true;
+            }
+          }
+        });
+      });
+    });
+
+    // Only save if changes were made
+    if (replacementsMade) {
+      await workbook.xlsx.writeFile(filePath);
+      console.log(`Successfully processed XLSX file: ${filePath}`);
+    } else {
+      console.log("No replacements were needed in the XLSX file");
+    }
+
+    return filePath;
+  } catch (error) {
+    console.error("Error in replaceInXlsx:", error);
+    throw error;
+  }
+}
+
 // Function to handle replacements for both .docx and .xlsx files
 async function replaceTextInFiles(targetWords, replacementWord, ...filePaths) {
   console.log("Starting text replacement in files:", {
@@ -115,4 +228,4 @@ async function replaceTextInFiles(targetWords, replacementWord, ...filePaths) {
   }
 }
 
-module.exports = { replaceTextInFiles, replaceInDocx };
+module.exports = { replaceTextInFiles, replaceInDocx, replaceInDocument };

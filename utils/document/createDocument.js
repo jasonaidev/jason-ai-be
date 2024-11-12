@@ -106,11 +106,32 @@ async function createDocument(req) {
       throw new Error("Failed to update assistant with new file.");
     }
 
+    let user_inputs;
+    if (data?.file) {
+      const currentDocumentFile = await strapi.db
+        .query("plugin::upload.file")
+        .findOne({
+          where: {
+            id: data?.file,
+          },
+        });
+
+      user_inputs = await fileParser(currentDocumentFile?.url);
+
+      console.log("user_inputs Text: ", user_inputs.slice(0, 50));
+    }
+
     // extract data from the template using the uploadedFileId
     const extractedDataFromDocument = await dataExtraction(
       uploadedFileId,
       fileExt,
-      data?.companyName
+      data?.companyName,
+      user_inputs
+    );
+
+    console.log(
+      "this is the extractedDataFromDocument",
+      extractedDataFromDocument
     );
 
     const outputDir = await ensureOutputDirectory();
@@ -136,12 +157,25 @@ async function createDocument(req) {
           );
         }
 
-        if (
-          parseArrayString(extractedDataFromDocument?.companyName)?.length > 0
-        ) {
-          for (com of parseArrayString(
-            extractedDataFromDocument?.companyName
-          )) {
+        for (com of extractedDataFromDocument?.otherInfo) {
+          const insertDocsss = await replaceInDocument(
+            outputFilePath,
+            [com?.docs],
+            [com?.info]
+          );
+        }
+
+        let companyName = [
+          ...parseArrayString(extractedDataFromDocument?.companyName),
+          "Insert Company Name",
+          "[Insert Company Name]",
+          "Company Name",
+          "Insert Company",
+          "Insert Company Here",
+          "[Insert Company Here]",
+        ];
+        if (companyName?.length > 0) {
+          for (com of companyName) {
             const insertDocss = await replaceInDocument(
               outputFilePath,
               [com],
@@ -164,12 +198,17 @@ async function createDocument(req) {
           }
         }
 
-        if (
-          parseArrayString(extractedDataFromDocument?.companyEmail)?.length > 0
-        ) {
-          for (com of parseArrayString(
-            extractedDataFromDocument?.companyEmail
-          )) {
+        let companyEmail = [
+          ...parseArrayString(extractedDataFromDocument?.companyEmail),
+          "Insert Company Email",
+          "[Insert Company Email]",
+          "Company Email",
+          "Insert Email",
+          "Insert Email Here",
+          "[Insert Email Here]",
+        ];
+        if (companyEmail?.length > 0) {
+          for (com of companyEmail) {
             const insertDocssss = await replaceInDocument(
               outputFilePath,
               [com],

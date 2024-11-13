@@ -17,7 +17,11 @@ const path = require("path");
 const { SystemPrompt } = require("../prompt.js");
 const { CheckFileStatus } = require("../openaiAssistant/CheckFileStatus.js");
 const { applyTemplateFormatting } = require("./applytemplateformatting.js");
-const { replaceInDocx, replaceInDocument } = require("./replace-text.js");
+const {
+  replaceInDocx,
+  replaceInDocument,
+  replaceEmail,
+} = require("./replace-text.js");
 const fs = require("fs").promises;
 
 // @ts-ignore
@@ -150,19 +154,23 @@ async function createDocument(req) {
         fileExt?.includes(".xlsx")
       ) {
         if (extractedDataFromDocument?.title) {
-          const insertDocs = await replaceInDocument(
-            outputFilePath,
-            [extractedDataFromDocument?.title],
-            data?.title
-          );
+          if (extractedDataFromDocument?.title !== "") {
+            const insertDocs = await replaceInDocument(
+              outputFilePath,
+              [extractedDataFromDocument?.title],
+              data?.title
+            );
+          }
         }
 
         for (com of extractedDataFromDocument?.otherInfo) {
-          const insertDocsss = await replaceInDocument(
-            outputFilePath,
-            [com?.docs],
-            [com?.info]
-          );
+          if (com?.docs !== "") {
+            const insertDocsss = await replaceInDocument(
+              outputFilePath,
+              [com?.docs],
+              com?.info
+            );
+          }
         }
 
         let companyName = [
@@ -176,11 +184,13 @@ async function createDocument(req) {
         ];
         if (companyName?.length > 0) {
           for (com of companyName) {
-            const insertDocss = await replaceInDocument(
-              outputFilePath,
-              [com],
-              data?.companyName
-            );
+            if (com !== "") {
+              const insertDocss = await replaceInDocument(
+                outputFilePath,
+                [com],
+                data?.companyName
+              );
+            }
           }
         }
 
@@ -190,11 +200,32 @@ async function createDocument(req) {
           for (com of parseArrayString(
             extractedDataFromDocument?.companyAbbr
           )) {
-            const insertDocsss = await replaceInDocument(
-              outputFilePath,
-              [com],
-              extractedDataFromDocument?.userAbb
-            );
+            if (com !== "") {
+              const insertDocsss = await replaceInDocument(
+                outputFilePath,
+                [com],
+                extractedDataFromDocument?.userAbb
+              );
+            }
+          }
+        }
+
+        let companyEmaill = [
+          ...parseArrayString(extractedDataFromDocument?.companyEmail),
+        ];
+
+        if (
+          companyEmaill?.length > 0 &&
+          (fileExt?.includes(".pdf") || fileExt?.includes(".docx"))
+        ) {
+          for (com of companyEmaill) {
+            if (com !== "") {
+              const insertDocssss = await replaceEmail(
+                outputFilePath,
+                [com],
+                data?.email
+              );
+            }
           }
         }
 
@@ -209,15 +240,15 @@ async function createDocument(req) {
         ];
         if (companyEmail?.length > 0) {
           for (com of companyEmail) {
-            const insertDocssss = await replaceInDocument(
-              outputFilePath,
-              [com],
-              data?.email
-            );
+            if (com !== "") {
+              const insertDocssss = await replaceInDocument(
+                outputFilePath,
+                [com],
+                data?.email
+              );
+            }
           }
         }
-
-        console.log("this is the insertDocs", insertDocs);
       }
     } catch (error) {
       console.error("Error in replaceInDocx: ", error);

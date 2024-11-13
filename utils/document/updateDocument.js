@@ -140,11 +140,11 @@ async function updateDocument(req) {
           );
         }
 
-        for (com of extractedDataFromDocument?.otherInfo) {
+        for (com of extractedDataFromDocument) {
           const insertDocsss = await replaceInDocument(
             outputFilePath,
             [com?.docs],
-            [com?.info]
+            com?.info
           );
         }
 
@@ -199,8 +199,6 @@ async function updateDocument(req) {
             );
           }
         }
-
-        console.log("this is the insertDocs", insertDocs);
       }
     } catch (error) {
       console.error("Error in replaceInDocx: ", error);

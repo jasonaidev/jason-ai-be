@@ -13,7 +13,7 @@ const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
 const path = require("path");
 const { SystemPrompt } = require("../prompt");
-const { replaceInDocx, replaceInDocument } = require("./replace-text");
+const { replaceInDocx, replaceInDocument, replaceEmail } = require("./replace-text");
 const fs = require("fs").promises;
 // @ts-ignore
 /**
@@ -133,19 +133,23 @@ async function updateDocument(req) {
         fileExt?.includes(".xlsx")
       ) {
         if (extractedDataFromDocument?.title) {
-          const insertDocs = await replaceInDocument(
-            outputFilePath,
-            [extractedDataFromDocument?.title],
-            data?.title
-          );
+          if (extractedDataFromDocument?.title !== "") {
+            const insertDocs = await replaceInDocument(
+              outputFilePath,
+              [extractedDataFromDocument?.title],
+              data?.title
+            );
+          }
         }
 
-        for (com of extractedDataFromDocument) {
-          const insertDocsss = await replaceInDocument(
-            outputFilePath,
-            [com?.docs],
-            com?.info
-          );
+        for (com of extractedDataFromDocument?.otherInfo) {
+          if (com?.docs !== "") {
+            const insertDocsss = await replaceInDocument(
+              outputFilePath,
+              [com?.docs],
+              com?.info
+            );
+          }
         }
 
         let companyName = [
@@ -159,11 +163,13 @@ async function updateDocument(req) {
         ];
         if (companyName?.length > 0) {
           for (com of companyName) {
-            const insertDocss = await replaceInDocument(
-              outputFilePath,
-              [com],
-              data?.companyName
-            );
+            if (com !== "") {
+              const insertDocss = await replaceInDocument(
+                outputFilePath,
+                [com],
+                data?.companyName
+              );
+            }
           }
         }
 
@@ -173,11 +179,32 @@ async function updateDocument(req) {
           for (com of parseArrayString(
             extractedDataFromDocument?.companyAbbr
           )) {
-            const insertDocsss = await replaceInDocument(
-              outputFilePath,
-              [com],
-              extractedDataFromDocument?.userAbb
-            );
+            if (com !== "") {
+              const insertDocsss = await replaceInDocument(
+                outputFilePath,
+                [com],
+                extractedDataFromDocument?.userAbb
+              );
+            }
+          }
+        }
+
+        let companyEmaill = [
+          ...parseArrayString(extractedDataFromDocument?.companyEmail),
+        ];
+
+        if (
+          companyEmaill?.length > 0 &&
+          (fileExt?.includes(".pdf") || fileExt?.includes(".docx"))
+        ) {
+          for (com of companyEmaill) {
+            if (com !== "") {
+              const insertDocssss = await replaceEmail(
+                outputFilePath,
+                [com],
+                data?.email
+              );
+            }
           }
         }
 
@@ -192,11 +219,13 @@ async function updateDocument(req) {
         ];
         if (companyEmail?.length > 0) {
           for (com of companyEmail) {
-            const insertDocssss = await replaceInDocument(
-              outputFilePath,
-              [com],
-              data?.email
-            );
+            if (com !== "") {
+              const insertDocssss = await replaceInDocument(
+                outputFilePath,
+                [com],
+                data?.email
+              );
+            }
           }
         }
       }

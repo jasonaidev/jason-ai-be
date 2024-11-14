@@ -1,38 +1,46 @@
-const fs = require('fs');
-const axios = require('axios');
+const fs = require("fs");
+const path = require("path");
+const axios = require("axios");
 
 // Function to download and save the file
-const downloadFile = async (/** @type {any} */ url, /** @type {fs.PathLike} */ outputPath) => {
+const downloadFile = async (url, outputPath) => {
   try {
+    // Create the directory path if it doesn't exist
+    const directory = path.dirname(outputPath);
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+      console.log(`Created directory: ${directory}`);
+    }
+
     const response = await axios({
-      method: 'GET',
+      method: "GET",
       url: url,
-      responseType: 'stream',
+      responseType: "stream",
     });
 
     const writer = fs.createWriteStream(outputPath);
 
     response.data.pipe(writer);
 
-    return new Promise((resolve) => {
-      writer.on('finish', () => {
-        console.log('File has been written successfully.'); // Log on successful write finish
-        resolve(true); // Resolve true on successful write finish
+    return new Promise((resolve, reject) => {
+      writer.on("finish", () => {
+        console.log("File has been written successfully.");
+        resolve(true);
       });
-      writer.on('error', () => {
-        console.error('An error occurred during file writing.');
+      writer.on("error", (error) => {
+        console.error("An error occurred during file writing:", error);
         writer.close();
-        
-        // Attempt to delete the file in case of error during writing (optional)
+
+        // Attempt to delete the file in case of error during writing
         fs.unlink(outputPath, (err) => {
-          if (err) console.error('Error deleting the partial file:', err);
-          resolve(false); // Resolve false on write error
+          if (err) console.error("Error deleting the partial file:", err);
         });
+        reject(error); // Reject with the actual error
       });
     });
   } catch (error) {
-    console.error('An error occurred during file download:', error.message);
-    return false; // Return false on download (request) error
+    console.error("An error occurred during file download:", error.message);
+    throw error; // Throw the error to be handled by the caller
   }
 };
 

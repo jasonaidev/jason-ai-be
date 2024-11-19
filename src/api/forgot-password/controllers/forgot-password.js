@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 module.exports = {
   async findOneByCode(ctx) {
     const { code } = ctx.request.body;
+
     const verificationCode = await strapi
       .query("api::forgot-password.forgot-password")
       .findOne({
@@ -15,6 +16,21 @@ module.exports = {
         populate: true,
       });
 
+    if (!verificationCode) {
+      return ctx.send({ error: "Code not found or already used" }, 404);
+    }
+
+    const createdAt = new Date(verificationCode.createdAt); // Convert createdAt to a Date object
+    const now = new Date(); // Get the current time
+
+    // Calculate the difference in milliseconds and convert to minutes
+    const timeDifferenceInMinutes = (now - createdAt) / (1000 * 60);
+
+    if (timeDifferenceInMinutes > 15) {
+      return ctx.send({ error: "Verification code has expired" }, 400);
+    }
+
+    // Proceed if the code is still valid
     ctx.send({ data: verificationCode });
   },
 
@@ -69,7 +85,7 @@ module.exports = {
         },
       });
 
-    const sender_link = `${process.env.WEBSITE_URL}/reset-password/?token=${resetCode}`
+    const sender_link = `${process.env.WEBSITE_URL}/reset-password/?token=${resetCode}`;
 
     // Implement your email sending logic here to send the reset code
     // Example: await sendResetCodeEmail(user.email, resetCode);
@@ -89,6 +105,7 @@ module.exports = {
        ${sender_link}
       
       If you did not initiate this request, you can safely ignore this email.
+      The link will expire in 15 minutes.
       
       Best regards,
       The Jason Team`,
@@ -98,6 +115,7 @@ module.exports = {
           <p>Please use the following link to proceed with the password reset:</p>
           <p><strong>${sender_link}</strong></p>
           <p>If you did not initiate this request, you can safely ignore this email.</p>
+          <p>The link will expire in 15 minutes.</p>
           <p>Best regards,<br />The Jason Team</p>
         `,
       });

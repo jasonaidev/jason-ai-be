@@ -184,7 +184,14 @@ async function createDocument(req) {
         ];
         if (companyName?.length > 0) {
           for (com of companyName) {
-            if (com !== "") {
+            if (
+              com !== "" &&
+              com !== "Insert Credit Union Here" &&
+              com !== "Insert Strategic Partner Here" &&
+              com !== "Insert Strategic Partners Here" &&
+              com !== "Insert Partner Here" &&
+              com !== "Insert Financial Institution Here"
+            ) {
               const insertDocss = await replaceInDocument(
                 outputFilePath,
                 [com],
@@ -200,7 +207,7 @@ async function createDocument(req) {
           for (com of parseArrayString(
             extractedDataFromDocument?.companyAbbr
           )) {
-            if (com !== "") {
+            if (com !== "" && com !== "MPL") {
               const insertDocsss = await replaceInDocument(
                 outputFilePath,
                 [com],
@@ -289,7 +296,14 @@ async function createDocument(req) {
 
     await deleteFileFromAssistant(uploadedFileId);
 
-    await deleteFile(`user_${data?.user}_${path.basename(filePath)}`);
+    const originalFileName = `user_${data?.user}_${path.basename(filePath)}`;
+
+    await deleteFile(originalFileName);
+
+    if (fileExt?.includes(".pdf")) {
+      const pdfFileName = originalFileName.replace(".docx", ".pdf");
+      await deleteFile(pdfFileName);
+    }
 
     return entry;
   } catch (error) {

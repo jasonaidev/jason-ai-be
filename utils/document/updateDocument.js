@@ -13,7 +13,11 @@ const { RunAssistant } = require("../openaiAssistant/RunAssistant");
 const { updateAssistant } = require("../openaiAssistant/UpdateAssistant");
 const path = require("path");
 const { SystemPrompt } = require("../prompt");
-const { replaceInDocx, replaceInDocument, replaceEmail } = require("./replace-text");
+const {
+  replaceInDocx,
+  replaceInDocument,
+  replaceEmail,
+} = require("./replace-text");
 const fs = require("fs").promises;
 // @ts-ignore
 /**
@@ -63,7 +67,7 @@ async function updateDocument(req) {
     ) {
       throw new Error("Template or file URL not found.");
     }
- 
+
     // Example usage:
     const fileUrl = selectedTemplate?.file?.url;
     const fileName = selectedTemplate?.file?.name;
@@ -163,7 +167,14 @@ async function updateDocument(req) {
         ];
         if (companyName?.length > 0) {
           for (com of companyName) {
-            if (com !== "") {
+            if (
+              com !== "" &&
+              com !== "Insert Credit Union Here" &&
+              com !== "Insert Strategic Partner Here" &&
+              com !== "Insert Strategic Partners Here" &&
+              com !== "Insert Partner Here" &&
+              com !== "Insert Financial Institution Here"
+            ) {
               const insertDocss = await replaceInDocument(
                 outputFilePath,
                 [com],
@@ -179,7 +190,7 @@ async function updateDocument(req) {
           for (com of parseArrayString(
             extractedDataFromDocument?.companyAbbr
           )) {
-            if (com !== "") {
+            if (com !== "" && com !== "MPL") {
               const insertDocsss = await replaceInDocument(
                 outputFilePath,
                 [com],
@@ -271,7 +282,14 @@ async function updateDocument(req) {
     await deleteFileFromAssistant(uploadedFileId);
     // await deleteFileFromAssistant(data?.openAiFileId);
 
-    await deleteFile(`user_${data?.user}_${path.basename(filePath)}`);
+    const originalFileName = `user_${data?.user}_${path.basename(filePath)}`;
+
+    await deleteFile(originalFileName);
+
+    if (fileExt?.includes(".pdf")) {
+      const pdfFileName = originalFileName.replace(".docx", ".pdf");
+      await deleteFile(pdfFileName);
+    }
 
     return entry;
   } catch (error) {

@@ -15,7 +15,7 @@ const dataExtraction = async (
               excelFile ? fileExt : ""
             } document identified by ID: ${uploadedFileId}. Your task is to identify and extract the following details:
 
-            this is the user's company name : ${companyname}
+            
 
             - Title: The header in the document, not the name of the document, but the header title inside the document(e.g ) the first heading (e.g G-1 Third-Party Vendor Management Component etc), the header title is normally on the first row or the first thing you see bold in the content of the document, also the title of the document should be standalone, for example if you see something like this "Compliance Training Component – Marketplace Lending Platform Partnership", then the title is "Complaince Training Component", the extension( '– Marketplace Lending Platform Partnership') should not be considered, also a tip, if it is an excel file(csv, xlsx) the title is usually in bold in the first row,row 1, for example in row 1 there can be "Military Lending Act Compliance Audit", that would be the title. also a title can be in this format too "[Insert Financial Institution Here] Credit Risk Model Governance Policy", if it is like that you will leave out the '[Insert Financial Institution Here]' and just use "Credit Risk Model Governane Policy" for it ".
             - Company Name: The full name of the company mentioned in the document, also if there is any text like Insert company name, company name etc in the document , please add it in the array,  add it in this format ([companyName] and not like ["companyName"]), it should just contain one element in the array.
@@ -26,7 +26,7 @@ const dataExtraction = async (
             - User Information: Extract relevant context from user_inputs : (${user_inputs}) based on context. For each piece of relevant information, create an object with 'info' containing the extracted context from user_inputs, and 'docs' containing the related content from the document identified by ID: ${uploadedFileId}. Return this as an array of objects, always return it in that format, do not return "Not available for this".
             Ensure the extracted information is precise and clearly presented. Do not include any irrelevant information or annotations. If multiple instances are found, provide all relevant occurrences.
 
-            You should always return the extracted information in the following format:
+            You should always return the extracted information in the following format:   
             
             title: Extracted Title
             companyName: [Extracted Company Name (should be in an array, e.g [companyName] and not like ["companyName"]), it should just contain one element in the array]
@@ -34,7 +34,7 @@ const dataExtraction = async (
             companyEmail: [Extracted Company Email (should be in an array, e.g [email1, email2, email3] and not like ["email1", "email2", "email3"])]
             description: Extracted Description  
             userAbb : Extracted User Abbreviation
-            otherInfo: [{"info": "extracted context from user_inputs", "docs": "related extracted content from the document identified by ID: ${uploadedFileId}"}]
+            otherInfo: [{"info": "extracted context", "docs": "related extracted content from the document identified by ID: ${uploadedFileId}"}]
 
             Note: Always give the result in the above format only(PLAIN TEXT). Do not provide anything else, if something is not available, then return it empty.
         `,

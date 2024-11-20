@@ -21,6 +21,7 @@ const {
   replaceInDocx,
   replaceInDocument,
   replaceEmail,
+  replaceInXlsx,
 } = require("./replace-text.js");
 const fs = require("fs").promises;
 
@@ -147,120 +148,264 @@ async function createDocument(req) {
 
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+    let done = [];
     try {
       if (
         fileExt?.includes(".pdf") ||
         fileExt?.includes(".docx") ||
         fileExt?.includes(".xlsx")
       ) {
-        if (extractedDataFromDocument?.title) {
-          if (extractedDataFromDocument?.title !== "") {
-            const insertDocs = await replaceInDocument(
-              outputFilePath,
-              [extractedDataFromDocument?.title],
-              data?.title
-            );
-          }
-        }
+        if (fileExt?.includes(".xlsx")) {
+          console.log("Processing Excel file");
+          // Batch process for Excel files
+          const replacements = [];
 
-        for (com of extractedDataFromDocument?.otherInfo) {
-          if (com?.docs !== "") {
-            const insertDocsss = await replaceInDocument(
-              outputFilePath,
-              [com?.docs],
-              com?.info
-            );
+          // Add title replacement if exists
+          if (
+            extractedDataFromDocument?.title &&
+            extractedDataFromDocument?.title !== ""
+          ) {
+            console.log("Adding title replacement");
+            replacements.push({
+              targets: [extractedDataFromDocument?.title],
+              replacement: data?.title,
+            });
           }
-        }
 
-        let companyName = [
-          ...parseArrayString(extractedDataFromDocument?.companyName),
-          "Insert Company Name",
-          "[Insert Company Name]",
-          "Company Name",
-          "Insert Company",
-          "Insert Company Here",
-          "[Insert Company Here]",
-        ];
-        if (companyName?.length > 0) {
-          for (com of companyName) {
-            if (
+          // Add other info replacements
+          if (extractedDataFromDocument?.otherInfo) {
+            console.log("Processing other info replacements");
+            for (const com of extractedDataFromDocument.otherInfo) {
+              if (com?.docs !== "" && !done.includes(com?.docs)) {
+                replacements.push({
+                  targets: [com?.docs],
+                  replacement: com?.info,
+                });
+                done.push(com?.docs);
+              }
+            }
+          }
+
+          // Add company name replacements
+          const companyName = [
+            ...parseArrayString(extractedDataFromDocument?.companyName),
+            "Insert Company Name",
+            "[Insert Company Name]",
+            "Company Name",
+            "Insert Company",
+            "Insert Company Here",
+            "[Insert Company Here]",
+          ].filter(
+            (com) =>
               com !== "" &&
               com !== "Insert Credit Union Here" &&
               com !== "Insert Strategic Partner Here" &&
               com !== "Insert Strategic Partners Here" &&
               com !== "Insert Partner Here" &&
-              com !== "Insert Financial Institution Here"
-            ) {
-              const insertDocss = await replaceInDocument(
-                outputFilePath,
-                [com],
-                data?.companyName
-              );
-            }
-          }
-        }
+              com !== "Insert Financial Institution Here" &&
+              !done.includes(com)
+          );
 
-        if (
-          parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
-        ) {
-          for (com of parseArrayString(
+          if (companyName.length > 0) {
+            console.log("Adding company name replacements");
+            replacements.push({
+              targets: companyName,
+              replacement: data?.companyName,
+            });
+            done.push(...companyName);
+          }
+
+          // Add company abbreviation replacements
+          const companyAbbr = parseArrayString(
             extractedDataFromDocument?.companyAbbr
-          )) {
-            if (com !== "" && com !== "MPL") {
-              const insertDocsss = await replaceInDocument(
+          ).filter((com) => com !== "" && com !== "MPL" && !done.includes(com));
+
+          if (companyAbbr.length > 0) {
+            console.log("Adding company abbreviation replacements");
+            replacements.push({
+              targets: companyAbbr,
+              replacement: extractedDataFromDocument?.userAbb,
+            });
+            done.push(...companyAbbr);
+          }
+
+          // Add email replacements
+          const companyEmail = [
+            ...parseArrayString(extractedDataFromDocument?.companyEmail),
+            "Insert Company Email",
+            "[Insert Company Email]",
+            "Company Email",
+            "Insert Email",
+            "Insert Email Here",
+            "[Insert Email Here]",
+          ].filter((com) => com !== "" && !done.includes(com));
+
+          if (companyEmail.length > 0) {
+            console.log("Adding email replacements");
+            replacements.push({
+              targets: companyEmail,
+              replacement: data?.email,
+            });
+            done.push(...companyEmail);
+          }
+
+          // Process all replacements in one go
+          console.log("Processing all replacements");
+          for (const replacement of replacements) {
+            try {
+              await replaceInXlsx(
                 outputFilePath,
-                [com],
-                extractedDataFromDocument?.userAbb
+                replacement.targets,
+                replacement.replacement
               );
+            } catch (error) {
+              console.error("Error making replacement:", error);
+              // Continue with other replacements
             }
           }
-        }
+        } else {
+          // Process PDF and DOCX files
+          console.log("Processing PDF/DOCX file");
 
-        let companyEmaill = [
-          ...parseArrayString(extractedDataFromDocument?.companyEmail),
-        ];
+          // Replace title
+          if (
+            extractedDataFromDocument?.title &&
+            extractedDataFromDocument?.title !== ""
+          ) {
+            console.log("Replacing title");
+            const insertDocs = await replaceInDocument(
+              outputFilePath,
+              [extractedDataFromDocument?.title],
+              data?.title,
+              false
+            );
+            done.push(extractedDataFromDocument?.title);
+          }
 
-        if (
-          companyEmaill?.length > 0 &&
-          (fileExt?.includes(".pdf") || fileExt?.includes(".docx"))
-        ) {
-          for (com of companyEmaill) {
-            if (com !== "") {
-              const insertDocssss = await replaceEmail(
-                outputFilePath,
-                [com],
-                data?.email
-              );
+          // Replace other info
+          if (extractedDataFromDocument?.otherInfo) {
+            console.log("Replacing other info");
+            for (const com of extractedDataFromDocument.otherInfo) {
+              if (com?.docs !== "" && !done.includes(com?.docs)) {
+                const insertDocsss = await replaceInDocument(
+                  outputFilePath,
+                  [com?.docs],
+                  com?.info,
+                  false
+                );
+                done.push(com?.docs);
+              }
             }
           }
-        }
 
-        let companyEmail = [
-          ...parseArrayString(extractedDataFromDocument?.companyEmail),
-          "Insert Company Email",
-          "[Insert Company Email]",
-          "Company Email",
-          "Insert Email",
-          "Insert Email Here",
-          "[Insert Email Here]",
-        ];
-        if (companyEmail?.length > 0) {
-          for (com of companyEmail) {
-            if (com !== "") {
-              const insertDocssss = await replaceInDocument(
-                outputFilePath,
-                [com],
-                data?.email
-              );
+          // Replace company name
+          let companyName = [
+            ...parseArrayString(extractedDataFromDocument?.companyName),
+            "Insert Company Name",
+            "[Insert Company Name]",
+            "Company Name",
+            "Insert Company",
+            "Insert Company Here",
+            "[Insert Company Here]",
+          ];
+
+          if (companyName?.length > 0) {
+            console.log("Replacing company names");
+            for (const com of companyName) {
+              if (
+                com !== "" &&
+                com !== "Insert Credit Union Here" &&
+                com !== "Insert Strategic Partner Here" &&
+                com !== "Insert Strategic Partners Here" &&
+                com !== "Insert Partner Here" &&
+                com !== "Insert Financial Institution Here" &&
+                com !== "MPL" &&
+                !done.includes(com)
+              ) {
+                const insertDocss = await replaceInDocument(
+                  outputFilePath,
+                  [com],
+                  data?.companyName,
+                  false
+                );
+                done.push(com);
+              }
+            }
+          }
+
+          // Replace company abbreviations
+          if (
+            parseArrayString(extractedDataFromDocument?.companyAbbr)?.length > 0
+          ) {
+            console.log("Replacing company abbreviations");
+            for (const com of parseArrayString(
+              extractedDataFromDocument?.companyAbbr
+            )) {
+              if (com !== "" && com !== "MPL" && !done.includes(com)) {
+                const insertDocsss = await replaceInDocument(
+                  outputFilePath,
+                  [com],
+                  extractedDataFromDocument?.userAbb,
+                  false
+                );
+                done.push(com);
+              }
+            }
+          }
+
+          // Replace company email (PDF/DOCX specific)
+          let companyEmaill = [
+            ...parseArrayString(extractedDataFromDocument?.companyEmail),
+          ];
+          if (companyEmaill?.length > 0) {
+            console.log("Replacing company emails (PDF/DOCX specific)");
+            for (const com of companyEmaill) {
+              if (com !== "" && !done.includes(com)) {
+                const insertDocssss = await replaceEmail(
+                  outputFilePath,
+                  [com],
+                  data?.email
+                );
+                done.push(com);
+              }
+            }
+          }
+
+          // Replace all email variations
+          let companyEmail = [
+            ...parseArrayString(extractedDataFromDocument?.companyEmail),
+            "Insert Company Email",
+            "[Insert Company Email]",
+            "Company Email",
+            "Insert Email",
+            "Insert Email Here",
+            "[Insert Email Here]",
+          ];
+
+          if (companyEmail?.length > 0) {
+            console.log("Replacing all email variations");
+            for (const com of companyEmail) {
+              if (com !== "" && !done.includes(com)) {
+                const insertDocssss = await replaceInDocument(
+                  outputFilePath,
+                  [com],
+                  data?.email,
+                  false
+                );
+                done.push(com);
+              }
             }
           }
         }
       }
+
+      console.log("Document processing completed");
     } catch (error) {
-      console.error("Error in replaceInDocx: ", error);
+      console.error("Error in document processing:", error);
+      throw error;
     }
 
+    let fileResponse;
     try {
       fileResponse = await fileUpload(
         outputFilePath,

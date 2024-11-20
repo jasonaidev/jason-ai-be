@@ -41,7 +41,7 @@ async function replaceInDocument(
       formData.append("replacement_word", replacementWord);
 
       // Send the request to the Python backend
-      const response = await fetch("http://127.0.0.1:5000/replace", {
+      const response = await fetch("https://jason-docs-processor.onrender.com/replace", {
         method: "POST",
         body: formData,
       });

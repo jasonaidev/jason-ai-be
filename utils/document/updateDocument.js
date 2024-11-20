@@ -17,6 +17,7 @@ const {
   replaceInDocx,
   replaceInDocument,
   replaceEmail,
+  replaceInXlsx,
 } = require("./replace-text");
 const fs = require("fs").promises;
 // @ts-ignore

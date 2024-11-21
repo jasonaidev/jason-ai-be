@@ -216,9 +216,11 @@ async function createDocument(req) {
           }
 
           // Add company abbreviation replacements
-          const companyAbbr = parseArrayString(
-            extractedDataFromDocument?.companyAbbr
-          ).filter((com) => com !== "" && com !== "MPL" && !done.includes(com));
+          const companyAbbr = [
+           ...parseArrayString(extractedDataFromDocument?.companyAbbr),
+            "iCW",
+            "ICW"
+          ].filter((com) => com !== "" && com !== "MPL" && !done.includes(com));
 
           if (companyAbbr.length > 0) {
             console.log("Adding company abbreviation replacements");

@@ -174,6 +174,8 @@ async function updateDocument(req) {
             "Insert Company Name",
             "[Insert Company Name]",
             "Company Name",
+            "iCreditWorks",
+            "iCreditWork",
             "Insert Company",
             "Insert Company Here",
             "[Insert Company Here]",

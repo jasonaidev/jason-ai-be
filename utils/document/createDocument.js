@@ -190,6 +190,8 @@ async function createDocument(req) {
           const companyName = [
             ...parseArrayString(extractedDataFromDocument?.companyName),
             "Insert Company Name",
+            "iCreditWorks",
+            "iCreditWork",
             "[Insert Company Name]",
             "Company Name",
             "Insert Company",
